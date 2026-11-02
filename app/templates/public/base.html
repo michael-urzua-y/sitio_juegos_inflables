@@ -1,0 +1,67 @@
+{% from "macros/ui.html" import icon with context %}
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+  {% include "partials/head.html" %}
+  {# --- SEO: cada página puede definir canonical, og_image, og_type, noindex y jsonld --- #}
+  {% set canonical = canonical or (negocio.url ~ request.path) %}
+  {% set og_image = og_image or (negocio.url ~ url_for('static', filename='img/og-default.jpg')) %}
+  <title>{% block title %}{{ negocio.seo_titulo or negocio.slogan }} | {{ negocio.nombre }}{% endblock %}</title>
+  <meta name="description" content="{% block description %}{{ seo.descripcion_negocio() }}{% endblock %}">
+  <meta name="keywords" content="{{ negocio.seo_palabras_clave }}">
+  <meta name="robots" content="{{ 'noindex, follow' if noindex else 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' }}">
+  <link rel="canonical" href="{{ canonical }}">
+  <meta name="author" content="{{ negocio.razon_social or negocio.nombre }}">
+  <meta name="geo.region" content="CL">
+  {% if negocio.ciudad %}<meta name="geo.placename" content="{{ negocio.ciudad }}">{% endif %}
+
+  {# Open Graph: Facebook, Instagram, WhatsApp, LinkedIn #}
+  <meta property="og:site_name" content="{{ negocio.nombre }}">
+  <meta property="og:locale" content="es_CL">
+  <meta property="og:type" content="{{ og_type or 'website' }}">
+  <meta property="og:url" content="{{ canonical }}">
+  <meta property="og:title" content="{{ self.title() }}">
+  <meta property="og:description" content="{{ self.description() }}">
+  <meta property="og:image" content="{{ og_image }}">
+  {% if og_image.startswith('https://') %}<meta property="og:image:secure_url" content="{{ og_image }}">{% endif %}
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="{{ self.title() }}">
+  {# Twitter / X #}
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ self.title() }}">
+  <meta name="twitter:description" content="{{ self.description() }}">
+  <meta name="twitter:image" content="{{ og_image }}">
+
+  {# Verificación de propiedad (se configuran en /admin/ajustes) #}
+  {% if negocio.google_verificacion %}<meta name="google-site-verification" content="{{ negocio.google_verificacion }}">{% endif %}
+  {% if negocio.bing_verificacion %}<meta name="msvalidate.01" content="{{ negocio.bing_verificacion }}">{% endif %}
+  {% if negocio.facebook_verificacion %}<meta name="facebook-domain-verification" content="{{ negocio.facebook_verificacion }}">{% endif %}
+
+  <link rel="manifest" href="{{ url_for('public.manifest') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/favicon-32.png') }}">
+  <link rel="alternate" type="text/plain" title="Resumen para IAs" href="{{ url_for('public.llms') }}">
+
+  {# Datos estructurados Schema.org (Google, Bing e IAs) #}
+  <script type="application/ld+json">{{ (jsonld or seo.grafo())|tojson }}</script>
+  <link rel="stylesheet" href="{{ asset('css/site.css') }}">
+</head>
+<body data-whatsapp="{{ negocio.whatsapp }}" data-negocio="{{ negocio.nombre }}">
+  {% include "partials/icons.html" %}
+  <a class="skip" href="#contenido">Saltar al contenido</a>
+  {% include "public/partials/header.html" %}
+  <main id="contenido">{% block content %}{% endblock %}</main>
+  {% include "public/partials/footer.html" %}
+
+  <a class="wa-float" href="{{ wa_url() }}"
+     target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+    {{ icon("whatsapp") }}<span class="wa-float__tip">¿Hablamos?</span>
+  </a>
+  {% include "public/partials/cart.html" %}
+  <div class="toast" data-toast role="status" aria-live="polite"></div>
+
+  <script src="{{ asset('js/app.js') }}" defer></script>
+</body>
+</html>

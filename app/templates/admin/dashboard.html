@@ -1,0 +1,77 @@
+{% extends "admin/base.html" %}
+{% from "macros/ui.html" import icon, pagination with context %}
+{% from "macros/forms.html" import post_button %}
+{% set filtros_activos = {"categoria": filtros.categoria or "", "q": filtros.q, "pagina": paginacion.page} %}
+{% block title %}Juegos{% endblock %}
+{% block heading %}Juegos{% endblock %}
+{% block actions %}<a href="{{ url_for('admin.juego_nuevo') }}" class="btn btn--primary">{{ icon("plus") }} Nuevo juego</a>{% endblock %}
+{% block content %}
+<div class="stats">
+  {% for label, valor in [("Total juegos", total), ("Visibles", activos), ("Ocultos", total - activos), ("Categorías", categorias|length)] %}
+  <div class="stat"><small>{{ label }}</small><strong>{{ valor }}</strong></div>
+  {% endfor %}
+</div>
+
+<form class="filter-bar" method="get" action="{{ url_for('admin.dashboard') }}" data-autosubmit role="search">
+  <label class="field field--inline">
+    <span>Categoría</span>
+    <select name="categoria">
+      <option value="">Todas las categorías ({{ total }})</option>
+      {% for c in categorias %}<option value="{{ c.id }}" {{ 'selected' if filtros.categoria == c.id }}>{{ c.nombre }} ({{ c.juegos.count() }})</option>{% endfor %}
+    </select>
+  </label>
+  <label class="field field--inline field--search">
+    <span>Buscar</span>
+    <span class="search-input">{{ icon("search") }}<input type="search" name="q" value="{{ filtros.q }}" placeholder="Nombre del juego…" maxlength="60"></span>
+  </label>
+  <button class="btn btn--primary filter-bar__btn" type="submit">Buscar</button>
+</form>
+
+<p class="results-admin">
+  {% if paginacion.total %}
+  Mostrando <strong>{{ paginacion.first }}–{{ paginacion.last }}</strong> de <strong>{{ paginacion.total }}</strong> juegos
+  {% else %}Sin resultados{% endif %}
+  {% if filtros.q or filtros.categoria %} · <a href="{{ url_for('admin.dashboard') }}">limpiar filtros</a>{% endif %}
+</p>
+
+{% if paginacion.items %}
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>Juego</th><th>Categoría</th><th class="num">Precio</th><th class="num">Orden</th><th>Estado</th><th><span class="sr-only">Acciones</span></th></tr></thead>
+    <tbody>
+      {% for j in paginacion.items %}
+      <tr class="{{ 'is-off' if not j.activo }}">
+        <td data-label="Juego">
+          <div class="cell-game">
+            <img src="{{ imagen_juego(j, 480) }}" alt="" width="64" height="48" loading="lazy">
+            <div><a class="cell-game__name" href="{{ url_for('admin.juego_editar', id=j.id) }}">{{ j.nombre }}</a>
+              {% if j.destacado %}<span class="badge badge--star">★ Destacado</span>{% endif %}
+              {% if not j.imagen %}<span class="badge">Sin foto</span>{% endif %}</div>
+          </div>
+        </td>
+        <td data-label="Categoría">{{ j.categoria.nombre }}</td>
+        <td data-label="Precio" class="num">{{ j.precio|clp }}</td>
+        <td data-label="Orden" class="num">{{ j.orden }}</td>
+        <td data-label="Estado">
+          {{ post_button(url_for('admin.juego_toggle', id=j.id), 'Visible' if j.activo else 'Oculto',
+                         'status status--' ~ ('on' if j.activo else 'off'), hidden=filtros_activos) }}
+        </td>
+        <td class="cell-actions">
+          <div class="actions">
+            <a href="{{ url_for('admin.juego_editar', id=j.id) }}" class="btn btn--sm btn--ghost">Editar</a>
+            {{ post_button(url_for('admin.juego_eliminar', id=j.id), icon("trash"), "icon-btn icon-btn--danger",
+                           confirm="¿Eliminar “" ~ j.nombre ~ "”? Esta acción no se puede deshacer.", hidden=filtros_activos) }}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{{ pagination(paginacion, "admin.dashboard", {"categoria": filtros.categoria, "q": filtros.q}) }}
+{% elif total == 0 %}
+<div class="empty"><p>No hay juegos todavía.</p><a href="{{ url_for('admin.juego_nuevo') }}" class="btn btn--primary">Agregar el primero</a></div>
+{% else %}
+<div class="empty"><p>No encontramos juegos con esos filtros.</p><a href="{{ url_for('admin.dashboard') }}" class="btn btn--ghost">Ver todos</a></div>
+{% endif %}
+{% endblock %}

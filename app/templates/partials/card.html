@@ -1,0 +1,22 @@
+{% from "macros/ui.html" import icon, add_button, price, hot_tag, img_juego with context %}
+{% macro card(j) -%}
+{% set cat = j.categoria %}
+<article class="card reveal" data-cat="{{ cat.slug }}" data-search="{{ (j.nombre ~ ' ' ~ cat.nombre)|lower }}">
+  <a href="{{ url_for('public.juego', slug=j.slug) }}" class="card__media" aria-label="Ver {{ j.nombre }}">
+    {{ img_juego(j) }}
+    {{ hot_tag(j) }}
+  </a>
+  <div class="card__body">
+    <a class="card__cat" href="{{ url_for('public.categoria', slug=cat.slug) }}">{{ cat.nombre }}</a>
+    <h3 class="card__title"><a href="{{ url_for('public.juego', slug=j.slug) }}">{{ j.nombre }}</a></h3>
+    <ul class="specs">
+      {% if j.medidas %}<li>{{ icon("size") }}{{ j.medidas }}</li>{% endif %}
+      {% if j.edad %}<li>{{ icon("smile") }}{{ j.edad }}</li>{% endif %}
+    </ul>
+    <div class="card__foot">
+      {{ price(j.precio) }}
+      {{ add_button(j) }}
+    </div>
+  </div>
+</article>
+{%- endmacro %}

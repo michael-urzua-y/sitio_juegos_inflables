@@ -1,0 +1,40 @@
+{% extends "admin/base.html" %}
+{% from "macros/ui.html" import icon with context %}
+{% from "macros/forms.html" import csrf, field, check, icon_picker %}
+{% block title %}{{ cfg.nombre }}{% endblock %}
+{% block heading %}Contenido de portada{% endblock %}
+
+{% macro form_bloque(b=None) %}
+<form class="panel cat-row {{ 'cat-row--new' if not b }}" method="post" action="{{ url_for('admin.contenido', tipo=tipo) }}">
+  {{ csrf() }}
+  {% if b %}<input type="hidden" name="id" value="{{ b.id }}">{% else %}<h2>Agregar</h2>{% endif %}
+  <div class="row row--titulo">
+    {{ field("titulo", cfg.titulo, b.titulo if b, required=true, maxlength=200) }}
+    {{ field("orden", "Orden", b.orden if b else (bloques|length) + 1, type="number", cls="field--sm") }}
+  </div>
+  {% if cfg.icono %}{{ icon_picker("icono", "Ícono", iconos, b.icono if b else "star") }}{% endif %}
+  {{ field("texto", cfg.texto, b.texto if b, type="textarea", rows=2, maxlength=1000) }}
+  <div class="cat-row__foot">
+    {{ check("activo", "Visible", b.activo if b else true) }}
+    <div class="actions">
+      <button class="btn btn--sm btn--primary" type="submit">{{ 'Guardar' if b else 'Agregar' }}</button>
+      {% if b %}
+      <button class="icon-btn icon-btn--danger" type="submit" formaction="{{ url_for('admin.contenido_eliminar', tipo=tipo, id=b.id) }}"
+              data-confirm-click="¿Eliminar este elemento?" aria-label="Eliminar">{{ icon("trash") }}</button>
+      {% endif %}
+    </div>
+  </div>
+</form>
+{% endmacro %}
+
+{% block content %}
+<div class="filters">
+  {% for clave, t in tipos.items() %}
+  <a href="{{ url_for('admin.contenido', tipo=clave) }}" class="chip {{ 'is-active' if clave == tipo }}">{{ t.nombre }}</a>
+  {% endfor %}
+</div>
+<div class="cat-list">
+  {% for b in bloques %}{{ form_bloque(b) }}{% endfor %}
+  {{ form_bloque() }}
+</div>
+{% endblock %}

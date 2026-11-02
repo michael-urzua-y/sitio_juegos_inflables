@@ -1,0 +1,109 @@
+{% extends "public/base.html" %}
+{% set jsonld = seo.grafo(seo.lista(destacados), seo.faq(bloques.faq)) %}
+{% from "macros/ui.html" import icon, wa_button, section_head, grid, img_juego with context %}
+{% block content %}
+<section class="hero">
+  <div class="hero__blob hero__blob--1"></div>
+  <div class="hero__blob hero__blob--2"></div>
+  <div class="container hero__grid">
+    <div class="hero__copy">
+      <span class="pill">{{ icon("sparkles") }} {{ negocio.slogan }}</span>
+      <h1>{{ negocio.hero_titulo|resaltar }}</h1>
+      <p class="lead">{{ negocio.hero_subtitulo }}</p>
+      <div class="hero__cta">
+        <a href="#catalogo" class="btn btn--accent btn--lg">Ver juegos {{ icon("arrow") }}</a>
+        {{ wa_button(label="Escríbenos", cls="btn--glass btn--lg") }}
+      </div>
+      <ul class="hero__stats">
+        {% for b in bloques.stat %}
+        <li><strong>{{ b.titulo }}</strong><span>{{ b.texto }}</span></li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="hero__art" aria-hidden="true">
+      {% for j in destacados[:3] %}
+      <figure class="hero__img hero__img--{{ loop.index }}">
+        {{ img_juego(j, sizes="(max-width: 600px) 60vw, 360px", lazy=false, alt="") }}
+        <figcaption>{{ j.nombre }} <b>{{ j.precio|clp }}</b></figcaption>
+      </figure>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<div class="marquee-wrap" aria-hidden="true"><div class="marquee">
+  <div class="marquee__track">
+    {% for _ in range(2) %}{% for c in categorias %}<span>{{ c.nombre }}</span><i>✦</i>{% endfor %}{% for c in categorias %}<span>{{ c.nombre }}</span><i>✦</i>{% endfor %}{% endfor %}
+  </div>
+</div></div>
+
+{% if bloques.beneficio %}
+<section class="trust">
+  <div class="container trust__grid">
+    {% for b in bloques.beneficio %}
+    <div class="trust__item"><span class="trust__ic">{{ icon(b.icono or "star") }}</span><div><strong>{{ b.titulo }}</strong><small>{{ b.texto }}</small></div></div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="section" id="categorias">
+  <div class="container">
+    {{ section_head("Categorías", "Encuentra el juego perfecto", "Tenemos opciones para todas las edades, espacios y tipos de evento.") }}
+    <div class="cats">
+      {% for c in categorias %}
+      <a href="{{ url_for('public.categoria', slug=c.slug) }}" class="cat reveal">
+        <span class="cat__ic grad-{{ loop.index0 % 8 }}">{{ icon(c.icono) }}</span>
+        <strong>{{ c.nombre }}</strong>
+        <small>{{ c.descripcion }}</small>
+        <span class="cat__go">Ver juegos {{ icon("arrow") }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section section--tint" id="catalogo">
+  <div class="container">
+    {{ section_head("Los más pedidos", "Favoritos de nuestros clientes", "Agrega los que te gusten a tu cotización y envíala directo por WhatsApp.") }}
+    {{ grid(destacados) }}
+    <div class="catalog-cta">
+      <a href="{{ url_catalogo() }}" class="btn btn--primary btn--lg">Ver catálogo completo ({{ total }} juegos) {{ icon("arrow") }}</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="como-funciona">
+  <div class="container">
+    {{ section_head("Así de fácil", "Cotiza en " ~ bloques.paso|length ~ " pasos") }}
+    <ol class="steps">
+      {% for b in bloques.paso %}
+      <li class="step reveal"><span class="step__n">{{ loop.index }}</span><h3>{{ b.titulo }}</h3><p>{{ b.texto }}</p></li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+
+<section class="section section--tint" id="faq">
+  <div class="container faq">
+    {% call section_head("Preguntas frecuentes", "Resolvemos tus dudas", "¿No encuentras lo que buscas? Escríbenos y te ayudamos.", "section__head--left") %}
+      {{ wa_button(label="Hablar por WhatsApp") }}
+    {% endcall %}
+    <div class="faq__list">
+      {% for b in bloques.faq %}
+      <details class="qa" {{ 'open' if loop.first }}><summary>{{ b.titulo }}</summary><p>{{ b.texto }}</p></details>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="container cta__inner">
+    <div>
+      <h2>¿Listo para la mejor fiesta?</h2>
+      <p>Reserva con anticipación, ¡los fines de semana se llenan rápido!</p>
+    </div>
+    <button class="btn btn--accent btn--lg" type="button" data-open-cart>{{ icon("list") }} Ver mi cotización</button>
+  </div>
+</section>
+{% endblock %}

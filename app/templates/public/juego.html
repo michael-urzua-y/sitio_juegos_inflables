@@ -1,0 +1,48 @@
+{% extends "public/base.html" %}
+{% from "macros/ui.html" import icon, grid, crumbs, add_button, wa_button, price, hot_tag, section_head, img_juego with context %}
+{% set categoria = juego.categoria %}
+{% set og_type = "product" %}
+{% set og_image = negocio.url ~ og_imagen_juego(juego) %}
+{% set jsonld = seo.grafo(
+     seo.producto(juego, og_imagen_juego(juego)),
+     seo.migas([("Catálogo", url_catalogo()), (categoria.nombre, url_catalogo(categoria)),
+                (juego.nombre, url_for('public.juego', slug=juego.slug))])) %}
+{% block title %}Arriendo {{ juego.nombre }} ({{ categoria.nombre }}) desde {{ juego.precio|clp }} | {{ negocio.nombre }}{% endblock %}
+{% block description %}{{ juego.descripcion|truncate(110) }} Arriendo desde {{ juego.precio|clp }} en {{ negocio.zona }}. Despacho e instalación incluidos.{% endblock %}
+{% block content %}
+<section class="section section--tight">
+  <div class="container">
+    {{ crumbs([("Catálogo", url_catalogo()), (categoria.nombre, url_catalogo(categoria)), (juego.nombre, None)]) }}
+    <div class="detail">
+      <div class="detail__media">
+        {{ img_juego(juego, sizes="(max-width: 1024px) 100vw, 640px", lazy=false, ancho=1400) }}
+        {{ hot_tag(juego) }}
+      </div>
+      <div class="detail__info">
+        <a class="card__cat" href="{{ url_for('public.categoria', slug=categoria.slug) }}">{{ categoria.nombre }}</a>
+        <h1>{{ juego.nombre }}</h1>
+        {{ price(juego.precio, "price--lg") }}
+        <p class="lead">{{ juego.descripcion }}</p>
+        <ul class="detail__specs">
+          {% for ic, label, valor in [("size", "Medidas", juego.medidas), ("smile", "Edad", juego.edad),
+                                      ("users", "Capacidad", juego.capacidad), ("truck", "Incluye", "Despacho e instalación")] if valor %}
+          <li>{{ icon(ic) }}<div><small>{{ label }}</small><strong>{{ valor }}</strong></div></li>
+          {% endfor %}
+        </ul>
+        <div class="detail__cta">
+          {{ add_button(juego, "Agregar a cotización", "btn--lg") }}
+          {{ wa_button("¡Hola! Me interesa arrendar: " ~ juego.nombre ~ " (" ~ juego.precio|clp ~ "). ¿Tienen disponibilidad?", "Consultar", "btn--wa btn--lg") }}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% if relacionados %}
+<section class="section section--tint section--tight">
+  <div class="container">
+    {{ section_head(None, "También te puede gustar", cls="section__head--left") }}
+    {{ grid(relacionados) }}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

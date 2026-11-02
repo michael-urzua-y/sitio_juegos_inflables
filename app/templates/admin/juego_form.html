@@ -1,0 +1,67 @@
+{% extends "admin/base.html" %}
+{% from "macros/ui.html" import icon with context %}
+{% from "macros/forms.html" import csrf, field, select, check %}
+{% set nuevo = not juego.id %}
+{# Si el POST falló, se re-muestran los valores enviados #}
+{% macro v(campo) %}{{ request.form.get(campo, juego[campo] if juego[campo] is not none else '') }}{% endmacro %}
+{% block title %}{{ 'Nuevo juego' if nuevo else juego.nombre }}{% endblock %}
+{% block heading %}{{ 'Nuevo juego' if nuevo else 'Editar: ' ~ juego.nombre }}{% endblock %}
+{% block actions %}{% if not nuevo and juego.activo %}<a href="{{ url_for('public.juego', slug=juego.slug) }}" target="_blank" rel="noopener" class="btn btn--ghost">Ver en el sitio</a>{% endif %}{% endblock %}
+{% block content %}
+<form class="form-grid" method="post" enctype="multipart/form-data">
+  {{ csrf() }}
+  <div class="panel">
+    <h2>Información</h2>
+    {{ field("nombre", "Nombre *", v("nombre"), required=true, maxlength=150) }}
+    <div class="row">
+      {# Select de categoría con acciones rápidas: crear una nueva o quitar la seleccionada (si no tiene juegos) #}
+      <div class="cat-select" data-cat-manager
+           data-url-crear="{{ url_for('admin.categoria_rapida') }}"
+           data-url-quitar="{{ url_for('admin.categoria_quitar', id=0) }}">
+        {{ select("categoria_id", "Categoría *", categorias|map(attribute="id")|zip(categorias|map(attribute="nombre")), request.form.get("categoria_id", juego.categoria_id)) }}
+        <div class="cat-select__tools">
+          <button type="button" class="link-action" data-cat-nueva>{{ icon("plus") }} Nueva categoría</button>
+          <button type="button" class="link-action link-action--danger" data-cat-quitar>{{ icon("trash") }} Quitar seleccionada</button>
+        </div>
+        <div class="cat-select__new" data-cat-form hidden>
+          <input type="text" maxlength="120" placeholder="Nombre de la nueva categoría" aria-label="Nombre de la nueva categoría" data-cat-nombre>
+          <button type="button" class="btn btn--sm btn--primary" data-cat-crear>Crear</button>
+          <button type="button" class="btn btn--sm btn--ghost" data-cat-cancelar>Cancelar</button>
+        </div>
+        <p class="cat-select__msg" data-cat-msg role="status" hidden></p>
+      </div>
+      {{ field("precio", "Precio (CLP) *", v("precio"), inputmode="numeric", placeholder="45000", required=true, maxlength=12) }}
+    </div>
+    {{ field("descripcion", "Descripción", v("descripcion"), type="textarea", rows=4, maxlength=2000) }}
+    <div class="row row--3">
+      {{ field("medidas", "Medidas", v("medidas"), placeholder="4 x 4 m", maxlength=80) }}
+      {{ field("edad", "Edad", v("edad"), placeholder="2 a 8 años", maxlength=80) }}
+      {{ field("capacidad", "Capacidad", v("capacidad"), placeholder="6 niños", maxlength=80) }}
+    </div>
+  </div>
+
+  <div class="stack">
+    <div class="panel">
+      <h2>Imagen</h2>
+      <label class="upload">
+        <img src="{{ imagen_juego(juego) }}" alt="" data-preview>
+        <input type="file" name="imagen" accept="image/jpeg,image/png,image/webp" data-file>
+        <span class="upload__hint">{{ icon("plus") }} Subir foto (JPG, PNG o WebP · máx 10 MB)</span>
+      </label>
+      <p class="muted small">Se optimiza automáticamente. Recomendado: foto horizontal (4:3).</p>
+      {% if juego.imagen %}{{ check("quitar_imagen", "Quitar foto y usar imagen referencial") }}{% endif %}
+    </div>
+    <div class="panel">
+      <h2>Publicación</h2>
+      {{ check("activo", "Visible en el sitio", juego.activo) }}
+      {{ check("destacado", "Destacado (“Más pedido”)", juego.destacado) }}
+      {{ field("orden", "Orden dentro de su categoría", juego.orden or 0, type="number", min=-999, max=999) }}
+      <p class="muted small">Número menor aparece primero.</p>
+    </div>
+    <div class="form-actions">
+      <a href="{{ url_for('admin.dashboard') }}" class="btn btn--ghost">Cancelar</a>
+      <button class="btn btn--primary" type="submit">{{ 'Crear juego' if nuevo else 'Guardar cambios' }}</button>
+    </div>
+  </div>
+</form>
+{% endblock %}

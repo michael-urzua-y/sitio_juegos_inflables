@@ -1,0 +1,56 @@
+{# Componentes de formulario reutilizables (admin y cotizador) #}
+{% from "macros/ui.html" import icon %}
+
+{% macro csrf() -%}
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+{%- endmacro %}
+
+{% macro field(name, label, value="", type="text", cls="") -%}
+<label class="field {{ cls }}"><span>{{ label }}</span>
+  {%- if type == "textarea" %}
+  <textarea name="{{ name }}" rows="{{ kwargs.rows or 3 }}" {% for k, v in kwargs.items() if k != 'rows' %}{{ k }}{% if v is not sameas true %}="{{ v }}"{% endif %} {% endfor %}>{{ value if value is not none }}</textarea>
+  {%- else %}
+  <input type="{{ type }}" name="{{ name }}" value="{{ value if value is not none }}" {% for k, v in kwargs.items() %}{{ k }}{% if v is not sameas true %}="{{ v }}"{% endif %} {% endfor %}>
+  {%- endif %}
+</label>
+{%- endmacro %}
+
+{% macro select(name, label, opciones, seleccionado, cls="") -%}
+{# opciones: lista de (valor, etiqueta) #}
+<label class="field {{ cls }}"><span>{{ label }}</span>
+  <select name="{{ name }}">
+    {% for valor, etiqueta in opciones %}<option value="{{ valor }}" {{ 'selected' if valor|string == seleccionado|string }}>{{ etiqueta }}</option>{% endfor %}
+  </select>
+</label>
+{%- endmacro %}
+
+{% macro check(name, label, checked=false) -%}
+<label class="check"><input type="checkbox" name="{{ name }}" value="1" {{ 'checked' if checked }}> {{ label }}</label>
+{%- endmacro %}
+
+{% macro post_button(action, label, cls="btn", confirm=None, hidden={}) -%}
+{# Botón que envía un POST con CSRF (para eliminar, activar, cerrar sesión...) #}
+<form method="post" action="{{ action }}" class="inline-form" {% if confirm %}data-confirm="{{ confirm }}"{% endif %}>
+  {{ csrf() }}
+  {% for k, v in hidden.items() %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endfor %}
+  <button class="{{ cls }}" type="submit">{{ label }}</button>
+</form>
+{%- endmacro %}
+
+
+{% macro icon_picker(name, label, iconos, seleccionado) -%}
+{# Selector visual de íconos: radios accesibles con teclado, sin JavaScript.
+   iconos: dict {id_icono: "Nombre (uso sugerido)"} #}
+<fieldset class="icon-picker">
+  <legend>{{ label }}</legend>
+  <div class="icon-picker__grid">
+    {% for valor, etiqueta in iconos.items() %}
+    <label class="icon-picker__opt" title="{{ etiqueta }}">
+      <input type="radio" name="{{ name }}" value="{{ valor }}" {{ 'checked' if valor == seleccionado }}>
+      <span class="icon-picker__ic">{{ icon(valor) }}</span>
+      <span class="icon-picker__txt">{{ etiqueta.split(' (')[0] }}</span>
+    </label>
+    {% endfor %}
+  </div>
+</fieldset>
+{%- endmacro %}

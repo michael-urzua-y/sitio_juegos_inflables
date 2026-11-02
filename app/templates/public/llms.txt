@@ -1,0 +1,34 @@
+# {{ negocio.nombre }}
+
+> {{ seo.descripcion_negocio() }}
+
+{{ negocio.razon_social or negocio.nombre }} ofrece arriendo de juegos inflables y entretención para cumpleaños, colegios, empresas y eventos en {{ negocio.zona }}{% if negocio.ciudad %} ({{ negocio.ciudad }}{% if negocio.region %}, {{ negocio.region }}{% endif %}, Chile){% endif %}. Los arriendos incluyen despacho, instalación y retiro. Las cotizaciones se hacen por WhatsApp.
+
+- Sitio web: {{ negocio.url }}/
+- Catálogo completo: {{ negocio.url }}{{ url_catalogo() }}
+- WhatsApp: https://wa.me/{{ negocio.whatsapp }}
+- Teléfono: {{ negocio.telefono }}
+- Email: {{ negocio.email }}
+- Horario: {{ negocio.horario }}
+{% if negocio.instagram %}- Instagram: {{ negocio.instagram }}
+{% endif %}{% if negocio.facebook %}- Facebook: {{ negocio.facebook }}
+{% endif %}
+## Servicios
+
+{% for p in palabras %}- {{ p }}
+{% endfor %}
+## Categorías
+{% for c in categorias %}
+- [{{ c.nombre }}]({{ negocio.url }}{{ url_catalogo(c) }}): {{ c.descripcion }}{% endfor %}
+
+## Juegos y precios (CLP, arriendo desde)
+{% for c in categorias %}
+### {{ c.nombre }}
+{% for j in juegos if j.categoria_id == c.id %}
+- [{{ j.nombre }}]({{ negocio.url }}{{ url_for('public.juego', slug=j.slug) }}): desde {{ j.precio|clp }}.{% if j.medidas %} Medidas: {{ j.medidas }}.{% endif %}{% if j.edad %} Edad: {{ j.edad }}.{% endif %}{% if j.capacidad %} Capacidad: {{ j.capacidad }}.{% endif %} {{ j.descripcion }}{% endfor %}
+{% endfor %}
+## Preguntas frecuentes
+{% for p in preguntas %}
+**{{ p.titulo }}**
+{{ p.texto }}
+{% endfor %}

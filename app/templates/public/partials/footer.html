@@ -1,0 +1,36 @@
+{% from "macros/ui.html" import icon, brand with context %}
+<footer class="footer" id="contacto">
+  <div class="container footer__grid">
+    <div class="footer__brand">
+      {{ brand("brand--light") }}
+      <p>{{ negocio.slogan }}. Diversión segura, puntual y con instalación incluida en {{ negocio.zona }}.</p>
+      <div class="social">
+        {% for red, url in [("instagram", negocio.instagram), ("facebook", negocio.facebook), ("whatsapp", wa_url())] if url %}
+        <a href="{{ url }}" target="_blank" rel="noopener" aria-label="{{ red|capitalize }}">{{ icon(red) }}</a>
+        {% endfor %}
+      </div>
+    </div>
+    <div>
+      <h4>Categorías</h4>
+      <ul class="footer__links">
+        {% for c in categorias %}<li><a href="{{ url_catalogo(c) }}">{{ c.nombre }}</a></li>{% endfor %}
+        <li><a href="{{ url_catalogo() }}"><strong>Ver todo el catálogo</strong></a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contacto</h4>
+      <ul class="footer__links footer__contact">
+        <li>{{ icon("whatsapp") }}<a href="{{ wa_url() }}" target="_blank" rel="noopener">{{ negocio.telefono }}</a></li>
+        <li>{{ icon("mail") }}<a href="mailto:{{ negocio.email }}">{{ negocio.email }}</a></li>
+        <li>{{ icon("pin") }}{{ negocio.zona }}</li>
+        <li>{{ icon("clock") }}{{ negocio.horario }}</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer__bottom">
+    <div class="container footer__bottom-inner">
+      <p>© {{ anio }} {{ negocio.razon_social or negocio.nombre }}. Todos los derechos reservados.</p>
+      <p>Sitio creado por <a href="{{ negocio.creditos_url }}" target="_blank" rel="noopener"><strong>{{ negocio.creditos }}</strong></a></p>
+    </div>
+  </div>
+</footer>

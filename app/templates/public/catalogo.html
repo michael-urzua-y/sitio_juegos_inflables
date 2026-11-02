@@ -1,0 +1,58 @@
+{% extends "public/base.html" %}
+{% from "macros/ui.html" import icon, grid, crumbs, search_form, pagination with context %}
+{% set titulo = categoria.nombre if categoria else "Catálogo de juegos" %}
+{# Búsquedas no se indexan (contenido duplicado); las páginas sí, con su propia canónica #}
+{% set noindex = q != "" %}
+{% set canonical = negocio.url ~ url_catalogo(categoria, pagina=paginacion.page) %}
+{% if categoria %}{% set og_image = negocio.url ~ og_imagen_categoria(categoria) %}{% endif %}
+{% set jsonld = seo.grafo(
+     seo.migas([("Catálogo", url_catalogo())] + ([(categoria.nombre, url_catalogo(categoria))] if categoria else [])),
+     seo.lista(paginacion.items, (paginacion.page - 1) * paginacion.per_page)) %}
+{% block title %}{% if categoria %}Arriendo de {{ categoria.nombre }} en {{ negocio.ciudad or negocio.zona }}{% else %}Catálogo: arriendo de juegos inflables y entretención{% endif %}{% if paginacion.page > 1 %} · Página {{ paginacion.page }}{% endif %} | {{ negocio.nombre }}{% endblock %}
+{% block description %}{{ categoria.descripcion if categoria else "Juegos inflables, acuáticos, toboganes, juegos mecanizados, camas elásticas y máquinas para eventos." }} Arriendo en {{ negocio.zona }} con despacho e instalación. Cotiza por WhatsApp.{% endblock %}
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    {{ crumbs([("Catálogo", url_catalogo() if categoria else None)] + ([(categoria.nombre, None)] if categoria else [])) }}
+    <div class="page-hero__row">
+      <span class="page-hero__ic grad-{{ (categorias.index(categoria) if categoria else 6) % 8 }}">{{ icon(categoria.icono if categoria else "sparkles") }}</span>
+      <div>
+        <h1>{{ titulo }}</h1>
+        <p class="lead">{{ categoria.descripcion if categoria else "Elige por categoría o busca tu juego favorito." }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section--tight">
+  <div class="container">
+    <div class="catalog-bar">
+      <nav class="chips" aria-label="Categorías">
+        <a class="chip {{ 'is-active' if not categoria }}" href="{{ url_catalogo(q=q) }}">Todos</a>
+        {% for c in categorias %}
+        <a class="chip {{ 'is-active' if categoria and c.id == categoria.id }}" href="{{ url_catalogo(c, q=q) }}">{{ c.nombre }}</a>
+        {% endfor %}
+      </nav>
+      {{ search_form(url_catalogo(categoria), q) }}
+    </div>
+
+    <p class="results" aria-live="polite">
+      <strong>{{ paginacion.total }}</strong> {{ 'juego' if paginacion.total == 1 else 'juegos' }}
+      {% if q %} para “{{ q }}” · <a href="{{ url_catalogo(categoria) }}">limpiar búsqueda</a>{% endif %}
+      {% if paginacion.pages > 1 %}<span class="muted"> · página {{ paginacion.page }} de {{ paginacion.pages }}</span>{% endif %}
+    </p>
+
+    {% if paginacion.items %}
+      {{ grid(paginacion.items) }}
+      {% if categoria %}{{ pagination(paginacion, "public.categoria", {"slug": categoria.slug, "q": q}) }}
+      {% else %}{{ pagination(paginacion, "public.catalogo_completo", {"q": q}) }}{% endif %}
+    {% else %}
+      <div class="empty-state">
+        <p><strong>No encontramos juegos{% if q %} para “{{ q }}”{% endif %}.</strong></p>
+        <p class="muted">Prueba con otra palabra o revisa todas las categorías.</p>
+        <a href="{{ url_catalogo() }}" class="btn btn--ghost">Ver todo el catálogo</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

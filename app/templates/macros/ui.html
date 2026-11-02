@@ -1,0 +1,89 @@
+{# Componentes reutilizables del sitio público #}
+
+{% macro icon(name, cls="") -%}
+<svg class="ic {{ cls }}" aria-hidden="true"><use href="#i-{{ name }}"/></svg>
+{%- endmacro %}
+
+{% macro wa_button(texto=None, label="Escríbenos", cls="btn--wa") -%}
+<a href="{{ wa_url(texto) }}" target="_blank" rel="noopener" class="btn {{ cls }}">{{ icon("whatsapp") }} {{ label }}</a>
+{%- endmacro %}
+
+{% macro add_button(j, label="Cotizar", cls="") -%}
+<button class="btn btn--add {{ cls }}" type="button" data-add
+  data-slug="{{ j.slug }}" data-nombre="{{ j.nombre }}" data-precio="{{ j.precio }}" data-cat="{{ j.categoria.nombre }}">
+  {{ icon("plus") }}<span>{{ label }}</span>
+</button>
+{%- endmacro %}
+
+{# Imagen de un juego: AVIF (más liviano) con respaldo WebP, en 3 tamaños #}
+{% macro img_juego(j, sizes="(max-width: 600px) 100vw, 400px", lazy=true, alt=None, ancho=960) -%}
+<picture>
+  {% if j.imagen %}<source type="image/avif" srcset="{{ srcset_juego(j, 'avif') }}" sizes="{{ sizes }}">{% endif %}
+  <img src="{{ imagen_juego(j, ancho) }}" {% if j.imagen %}srcset="{{ srcset_juego(j) }}" sizes="{{ sizes }}"{% endif %}
+       alt="{{ j.nombre if alt is none else alt }}" width="800" height="600" decoding="async" {{ 'loading="lazy"'|safe if lazy }}>
+</picture>
+{%- endmacro %}
+
+{% macro price(valor, cls="") -%}
+<p class="price {{ cls }}"><small>Desde</small>{{ valor|clp }}</p>
+{%- endmacro %}
+
+{% macro hot_tag(j) -%}
+{% if j.destacado %}<span class="tag tag--hot">{{ icon("star") }} Más pedido</span>{% endif %}
+{%- endmacro %}
+
+{% macro brand(cls="") -%}
+<a href="{{ url_for('public.inicio') }}" class="brand {{ cls }}" aria-label="{{ negocio.nombre }} - inicio">
+  <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="" width="44" height="44">
+  <span>{{ negocio.nombre }}</span>
+</a>
+{%- endmacro %}
+
+{% macro section_head(eyebrow, titulo, texto=None, cls="") -%}
+<div class="section__head {{ cls }}">
+  {% if eyebrow %}<span class="eyebrow">{{ eyebrow }}</span>{% endif %}
+  <h2>{{ titulo }}</h2>
+  {% if texto %}<p class="muted">{{ texto }}</p>{% endif %}
+  {{ caller() if caller }}
+</div>
+{%- endmacro %}
+
+{% macro grid(juegos) -%}
+{% from "partials/card.html" import card with context %}
+<div class="grid" data-grid>{% for j in juegos %}{{ card(j) }}{% endfor %}</div>
+{%- endmacro %}
+
+{% macro crumbs(items) -%}
+<nav class="crumbs" aria-label="Migas de pan">
+  <a href="{{ url_for('public.inicio') }}">Inicio</a>
+  {% for label, href in items %}<span>/</span>{% if href %}<a href="{{ href }}">{{ label }}</a>{% else %}<span>{{ label }}</span>{% endif %}{% endfor %}
+</nav>
+{%- endmacro %}
+
+
+{# Buscador del catálogo (GET): se usa en la portada y en el listado #}
+{% macro search_form(action, q="", autofocus=false) -%}
+<form class="search" action="{{ action }}" method="get" role="search">
+  {{ icon("search") }}
+  <input type="search" name="q" value="{{ q }}" placeholder="Buscar juego… ej: tobogán, castillo" aria-label="Buscar juego" maxlength="60" {{ 'autofocus' if autofocus }}>
+  <button class="btn btn--primary btn--sm" type="submit">Buscar</button>
+</form>
+{%- endmacro %}
+
+{# Paginación numerada reutilizable (sitio y admin).
+   endpoint + params: ruta y filtros a conservar, ej: ("admin.dashboard", {"categoria": 3, "q": "toro"}) #}
+{% macro pagination(p, endpoint, params={}) -%}
+{% if p.pages > 1 %}
+<nav class="pager" aria-label="Paginación">
+  {% if p.has_prev %}<a class="pager__btn" href="{{ url_listado(endpoint, pagina=p.prev_num, **params) }}" rel="prev">← Anterior</a>{% endif %}
+  <div class="pager__nums">
+    {% for n in p.iter_pages(left_edge=1, left_current=1, right_current=2, right_edge=1) %}
+      {% if n is none %}<span class="pager__gap">…</span>
+      {% elif n == p.page %}<span class="pager__num is-active" aria-current="page">{{ n }}</span>
+      {% else %}<a class="pager__num" href="{{ url_listado(endpoint, pagina=n, **params) }}">{{ n }}</a>{% endif %}
+    {% endfor %}
+  </div>
+  {% if p.has_next %}<a class="pager__btn" href="{{ url_listado(endpoint, pagina=p.next_num, **params) }}" rel="next">Siguiente →</a>{% endif %}
+</nav>
+{% endif %}
+{%- endmacro %}

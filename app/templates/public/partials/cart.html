@@ -1,0 +1,43 @@
+{% from "macros/ui.html" import icon with context %}
+{% from "macros/forms.html" import field %}
+<div class="overlay" data-overlay hidden></div>
+<aside class="cart" id="cart" aria-label="Mi cotización" aria-hidden="true">
+  <div class="cart__head">
+    <div>
+      <h2>Mi cotización</h2>
+      <p class="muted" data-cart-sub>Agrega juegos para cotizar</p>
+    </div>
+    <button class="icon-btn" type="button" data-close-cart aria-label="Cerrar">{{ icon("x") }}</button>
+  </div>
+  <div class="cart__body">
+    <div class="cart__empty" data-empty>
+      <div class="cart__empty-ic">{{ icon("list") }}</div>
+      <p><strong>Tu cotización está vacía</strong></p>
+      <p class="muted">Explora el catálogo y presiona “Cotizar” en los juegos que te gusten.</p>
+      <a href="{{ url_for('public.inicio') }}#catalogo" class="btn btn--ghost" data-close-cart>Ver juegos</a>
+    </div>
+    <ul class="cart__list" data-list></ul>
+    <form class="cart__form" data-form hidden novalidate>
+      <h3>Datos del evento <span class="req-note">Todos los campos son obligatorios</span></h3>
+      {{ field("nombre", "Tu nombre", placeholder="Ej: Juan Pérez", autocomplete="name", required=true, minlength=2, maxlength=60) }}
+      <div class="field-row">
+        {{ field("fecha", "Fecha del evento", type="date", required=true) }}
+        {{ field("comuna", "Comuna", placeholder="Ej: Maipú", list="comunas-rm", autocomplete="off", required=true, minlength=2, maxlength=40) }}
+      </div>
+      <datalist id="comunas-rm">{% for c in comunas_rm %}<option value="{{ c }}">{% endfor %}</datalist>
+      <div class="field-row">
+        {{ field("hora_inicio", "Desde", type="time", required=true, step=900) }}
+        {{ field("hora_fin", "Hasta", type="time", required=true, step=900) }}
+      </div>
+      {{ field("detalles", "Detalles del evento", type="textarea", rows=2, required=true, minlength=5, maxlength=300,
+               placeholder="Tipo de evento, cantidad de niños, superficie (pasto, cemento)…") }}
+    </form>
+  </div>
+  <div class="cart__foot" data-foot hidden>
+    <div class="cart__total"><span>Total referencial</span><strong data-total>$0</strong></div>
+    <p class="muted small">El valor final puede variar según comuna, horario y despacho.</p>
+    <button class="btn btn--wa btn--block" type="button" data-send disabled aria-describedby="cart-faltan">{{ icon("whatsapp") }} Enviar cotización por WhatsApp</button>
+    <p class="cart__faltan" id="cart-faltan" data-faltan aria-live="polite"></p>
+    <button class="link-btn" type="button" data-clear>Vaciar cotización</button>
+  </div>
+</aside>

@@ -1,0 +1,17 @@
+{% extends "admin/base.html" %}
+{% from "macros/forms.html" import csrf, field %}
+{% block title %}{{ titulo }}{% endblock %}
+{% block heading %}{{ titulo }}{% endblock %}
+{% block content %}
+<form method="post" class="stack stack--narrow">
+  {{ csrf() }}
+  {% for grupo, campos in grupos %}
+  <div class="panel">
+    <h2>{{ grupo }}</h2>
+    {% for clave, label, tipo in campos %}{{ field(clave, label, valores[clave], type=tipo, maxlength=500) }}{% endfor %}
+  </div>
+  {% endfor %}
+  {% if ayuda %}<p class="muted small">{{ ayuda }}</p>{% endif %}
+  <div class="form-actions"><button class="btn btn--primary" type="submit">Guardar cambios</button></div>
+</form>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "admin/base.html" %}
+{% from "macros/ui.html" import icon with context %}
+{% from "macros/forms.html" import csrf, field, post_button %}
+{% block title %}Usuarios{% endblock %}
+{% block heading %}Usuarios{% endblock %}
+{% block content %}
+<div class="stack stack--narrow">
+  {% for u in usuarios %}
+  <div class="panel user-card">
+    <div class="user-card__head">
+      <span class="user-card__ic {{ 'grad-6' if u.es_superadmin else 'grad-0' }}">{{ icon("shield" if u.es_superadmin else "users") }}</span>
+      <div>
+        <strong>{{ u.username }}</strong>
+        <small>{{ 'Super admin' if u.es_superadmin else 'Administrador (dueño del negocio)' }}
+          · Último ingreso: {{ u.ultimo_login.strftime('%d/%m/%Y %H:%M') ~ ' UTC' if u.ultimo_login else 'nunca' }}</small>
+      </div>
+      {% if u.bloqueado %}<span class="badge badge--danger">Bloqueado</span>
+        {{ post_button(url_for('admin.usuario_desbloquear', id=u.id), "Desbloquear", "btn btn--sm btn--ghost") }}{% endif %}
+    </div>
+
+    {% if u.id == current_user.id %}
+      <p class="muted small">Es tu cuenta. Para cambiar tu contraseña usa <a href="{{ url_for('admin.password') }}">Mi contraseña</a>.</p>
+    {% else %}
+      <form method="post" action="{{ url_for('admin.usuario_password', id=u.id) }}" autocomplete="off">
+        {{ csrf() }}
+        <div class="row">
+          {{ field("nueva", "Nueva contraseña (mín. 8 caracteres)", type="password", autocomplete="new-password", minlength=8, required=true) }}
+          {{ field("confirmar", "Repetir contraseña", type="password", autocomplete="new-password", minlength=8, required=true) }}
+        </div>
+        <div class="form-actions">
+          <button class="btn btn--primary" type="submit">Cambiar contraseña</button>
+        </div>
+      </form>
+    {% endif %}
+  </div>
+  {% endfor %}
+  <p class="muted small">Al cambiar la contraseña de un usuario se cierran todas sus sesiones abiertas.</p>
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "public/base.html" %}
+{% set noindex = true %}
+{% block title %}Página no encontrada · {{ negocio.nombre }}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container notfound">
+    <span class="notfound__code">404</span>
+    <h1>¡Ups! Esta página se desinfló</h1>
+    <p class="lead muted">La página que buscas no existe o fue movida.</p>
+    <a href="{{ url_for('public.inicio') }}" class="btn btn--primary btn--lg">Volver al inicio</a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% from "macros/ui.html" import icon, brand with context %}
+<header class="header" id="header">
+  <div class="container header__inner">
+    {{ brand() }}
+    <nav class="nav" id="nav" aria-label="Principal">
+      <a href="{{ url_catalogo() }}" class="nav__link">Catálogo</a>
+      <div class="nav__drop">
+        <button class="nav__link" type="button" aria-expanded="false" data-drop>Juegos {{ icon("chevron") }}</button>
+        <div class="drop">
+          {% for c in categorias %}
+          <a href="{{ url_for('public.categoria', slug=c.slug) }}" class="drop__item">
+            <span class="drop__ic grad-{{ loop.index0 % 8 }}">{{ icon(c.icono) }}</span>
+            <span><strong>{{ c.nombre }}</strong><small>{{ c.descripcion }}</small></span>
+          </a>
+          {% endfor %}
+          <a href="{{ url_catalogo() }}" class="drop__all">Ver catálogo completo {{ icon("arrow") }}</a>
+        </div>
+      </div>
+      {% for label, ancla in [("Cómo funciona", "como-funciona"), ("Preguntas", "faq")] %}
+      <a href="{{ url_for('public.inicio') }}#{{ ancla }}" class="nav__link">{{ label }}</a>
+      {% endfor %}
+      <a href="#contacto" class="nav__link">Contacto</a>
+    </nav>
+    <div class="header__actions">
+      <button class="btn btn--primary btn--quote" type="button" data-open-cart aria-label="Abrir mi cotización">
+        {{ icon("list") }}<span class="hide-sm">Mi cotización</span>
+        <span class="count" data-count hidden>0</span>
+      </button>
+      <button class="burger" type="button" aria-label="Abrir menú" aria-controls="nav" aria-expanded="false" data-burger>{{ icon("menu") }}</button>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,19 @@
+{% extends "admin/base.html" %}
+{% from "macros/forms.html" import csrf, field, icon_picker %}
+{% set nueva = not cat.id %}
+{% block title %}{{ 'Nueva categoría' if nueva else cat.nombre }}{% endblock %}
+{% block heading %}{{ 'Nueva categoría' if nueva else 'Editar: ' ~ cat.nombre }}{% endblock %}
+{% block actions %}{% if not nueva %}<a href="{{ url_catalogo(cat) }}" target="_blank" rel="noopener" class="btn btn--ghost"><span class="hide-sm">Ver en el sitio</span><span class="only-sm-inline">Ver</span></a>{% endif %}{% endblock %}
+{% block content %}
+<form method="post" class="panel stack--narrow">
+  {{ csrf() }}
+  {{ field("nombre", "Nombre *", request.form.get("nombre", cat.nombre or ""), required=true, maxlength=120, placeholder="Ej: Fiesta de Espuma") }}
+  {{ field("descripcion", "Descripción (aparece en la tarjeta de la categoría)", request.form.get("descripcion", cat.descripcion or ""), type="textarea", rows=2, maxlength=255) }}
+  {{ icon_picker("icono", "Ícono", iconos, request.form.get("icono", cat.icono)) }}
+  {% if not nueva %}<p class="muted small">Dirección en el sitio: /categoria/{{ cat.slug }}</p>{% endif %}
+  <div class="form-actions">
+    <a href="{{ url_for('admin.categorias') }}" class="btn btn--ghost">Cancelar</a>
+    <button class="btn btn--primary" type="submit">{{ 'Crear categoría' if nueva else 'Guardar cambios' }}</button>
+  </div>
+</form>
+{% endblock %}

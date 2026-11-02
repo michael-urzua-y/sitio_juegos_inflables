@@ -1,0 +1,36 @@
+{% extends "admin/base.html" %}
+{% from "macros/ui.html" import icon with context %}
+{% from "macros/forms.html" import post_button %}
+{% block title %}Categorías{% endblock %}
+{% block heading %}Categorías{% endblock %}
+{% block actions %}<a href="{{ url_for('admin.categoria_nueva') }}" class="btn btn--ghost">{{ icon("plus") }} <span class="hide-sm">Nueva categoría</span></a>{% endblock %}
+{% block content %}
+<p class="muted small page-help">Usa las flechas para cambiar el orden en que aparecen en el sitio.</p>
+<ul class="cat-admin">
+  {% for c in categorias %}
+  <li class="cat-admin__row">
+    <div class="cat-admin__order">
+      {{ post_button(url_for('admin.categoria_mover', id=c.id), icon("chevron", "ic--up"), "icon-btn icon-btn--sm",
+                     hidden={"direccion": "arriba"}) if not loop.first else '<span class="icon-btn icon-btn--sm is-disabled"></span>'|safe }}
+      <span class="cat-admin__pos">{{ loop.index }}</span>
+      {{ post_button(url_for('admin.categoria_mover', id=c.id), icon("chevron"), "icon-btn icon-btn--sm",
+                     hidden={"direccion": "abajo"}) if not loop.last else '<span class="icon-btn icon-btn--sm is-disabled"></span>'|safe }}
+    </div>
+    <span class="cat-admin__ic grad-{{ loop.index0 % 8 }}">{{ icon(c.icono) }}</span>
+    <a class="cat-admin__info" href="{{ url_for('admin.categoria_editar', id=c.id) }}">
+      <strong>{{ c.nombre }}</strong>
+      <small>{{ c.descripcion }}</small>
+    </a>
+    {% set n = c.juegos.count() %}
+    <a class="cat-admin__count" href="{{ url_for('admin.dashboard', categoria=c.id) }}" title="Ver juegos de esta categoría">{{ n }} {{ 'juego' if n == 1 else 'juegos' }}</a>
+    <div class="cat-admin__actions">
+      <a href="{{ url_for('admin.categoria_editar', id=c.id) }}" class="btn btn--sm btn--ghost">Editar</a>
+      {% if n == 0 %}
+      {{ post_button(url_for('admin.categoria_eliminar', id=c.id), icon("trash"), "icon-btn icon-btn--danger",
+                     confirm="¿Eliminar la categoría “" ~ c.nombre ~ "”?") }}
+      {% endif %}
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}
