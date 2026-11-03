@@ -1,20 +1,26 @@
 /* =========================================================
    core.css — estilos compartidos por el sitio y el panel admin
-   Design tokens
+   Design tokens — paleta tomada del logo (azul rey, rojo, amarillo y
+   naranja sobre noche de feria). Si cambia el logo, se ajusta solo aquí.
    ========================================================= */
 :root{
-  --primary:#6D28D9; --primary-600:#7C3AED; --primary-50:#F5F3FF; --primary-100:#EDE9FE;
-  --accent:#FF7A1A; --accent-600:#F25F00; --pink:#EC4899; --sun:#FDE68A;
+  --primary:#1D4ED8; --primary-600:#2563EB; --primary-50:#EFF6FF; --primary-100:#DBEAFE;
+  --accent:#FF8A00; --accent-600:#F06A00; --gold:#FFC31E; --sun:#FFE066;
+  --red:#E5202E; --red-600:#C81E2B;
+  --night:#070B1E; --night-2:#0F1A44;
   --wa:#25D366; --wa-600:#1EBE5A;
-  --ink:#1A1033; --ink-2:#3B3355; --muted:#6B6585; --line:#ECE8F5;
-  --bg:#FFFFFF; --tint:#F8F6FD; --surface:#FFFFFF;
+  --ink:#0B1026; --ink-2:#2B3352; --muted:#5F6784; --line:#E5E9F3;
+  --bg:#FFFFFF; --tint:#F5F7FD; --surface:#FFFFFF;
   --radius-sm:12px; --radius:20px; --radius-lg:28px;
-  --shadow-sm:0 1px 2px rgba(26,16,51,.06),0 2px 8px rgba(26,16,51,.05);
-  --shadow:0 10px 30px -12px rgba(76,29,149,.25);
-  --shadow-lg:0 30px 60px -20px rgba(76,29,149,.35);
+  --shadow-sm:0 1px 2px rgba(11,16,38,.06),0 2px 8px rgba(11,16,38,.05);
+  --shadow:0 10px 30px -12px rgba(29,78,216,.25);
+  --shadow-lg:0 30px 60px -20px rgba(29,78,216,.35);
   --font-display:"Fredoka",system-ui,sans-serif;
   --font:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --header-h:76px;
+  --header-h:80px;
+  /* Logo "colgante": sobresale bajo el header; al hacer scroll se encoge para caber dentro */
+  --logo:168px; --logo-top:6px;
+  --logo-overhang:calc(var(--logo) + var(--logo-top) - var(--header-h));
   --ease:cubic-bezier(.2,.8,.2,1);
 }
 
@@ -52,8 +58,8 @@ p{margin:0 0 1em}
 .btn--lg{padding:1rem 1.6rem;font-size:1rem;min-height:52px}
 .btn--block{width:100%}
 .btn--sm{padding:.5rem .9rem;min-height:36px;font-size:.85rem}
-.btn--primary{background:linear-gradient(135deg,var(--primary),var(--primary-600));color:#fff;box-shadow:0 8px 20px -8px rgba(109,40,217,.6)}
-.btn--accent{background:linear-gradient(135deg,var(--accent),#FF9A3D);color:#fff;box-shadow:0 10px 24px -8px rgba(255,122,26,.7)}
+.btn--primary{background:linear-gradient(135deg,var(--primary),var(--primary-600));color:#fff;box-shadow:0 8px 20px -8px rgba(29,78,216,.6)}
+.btn--accent{background:linear-gradient(135deg,var(--red),var(--accent));color:#fff;box-shadow:0 10px 24px -8px rgba(229,32,46,.65)}
 .btn--glass{background:rgba(255,255,255,.12);color:#fff;border:1.5px solid rgba(255,255,255,.35);backdrop-filter:blur(8px)}
 .btn--glass:hover{background:rgba(255,255,255,.2)}
 .btn--ghost{background:var(--primary-50);color:var(--primary)}
@@ -73,14 +79,15 @@ p{margin:0 0 1em}
 .sprite{position:absolute;width:0;height:0;overflow:hidden}
 
 /* Degradados reutilizables (categorías, íconos) */
-.grad-0{background:linear-gradient(135deg,#8B5CF6,#EC4899)}
-.grad-1{background:linear-gradient(135deg,#06B6D4,#2563EB)}
-.grad-2{background:linear-gradient(135deg,#F97316,#EF4444)}
-.grad-3{background:linear-gradient(135deg,#10B981,#0EA5E9)}
-.grad-4{background:linear-gradient(135deg,#F59E0B,#F97316)}
-.grad-5{background:linear-gradient(135deg,#EC4899,#F43F5E)}
-.grad-6{background:linear-gradient(135deg,#6366F1,#A855F7)}
-.grad-7{background:linear-gradient(135deg,#2563EB,#E11D48)}
+/* Degradados en la gama del logo (azul, rojo, amarillo, naranja) + un par de acentos */
+.grad-0{background:linear-gradient(135deg,var(--primary-600),var(--night-2))}
+.grad-1{background:linear-gradient(135deg,var(--red),var(--accent))}
+.grad-2{background:linear-gradient(135deg,var(--gold),var(--accent))}
+.grad-3{background:linear-gradient(135deg,#0EA5E9,var(--primary))}
+.grad-4{background:linear-gradient(135deg,var(--red),var(--red-600))}
+.grad-5{background:linear-gradient(135deg,#10B981,#0EA5E9)}
+.grad-6{background:linear-gradient(135deg,var(--accent),var(--red))}
+.grad-7{background:linear-gradient(135deg,var(--primary),var(--red))}
 
 /* =========================================================
    Formularios
@@ -107,7 +114,7 @@ p{margin:0 0 1em}
 .pager__num,.pager__btn,.pager__gap{display:grid;place-items:center;min-width:44px;height:44px;padding:0 .9rem;border-radius:999px;font-weight:700}
 .pager__num,.pager__btn{background:#fff;border:1.5px solid var(--line);transition:.2s}
 .pager__num:hover,.pager__btn:hover{border-color:var(--primary-600);color:var(--primary)}
-.pager__num.is-active{background:linear-gradient(135deg,var(--primary),#C026D3);border-color:transparent;color:#fff}
+.pager__num.is-active{background:linear-gradient(135deg,var(--primary),var(--primary-600));border-color:transparent;color:#fff}
 @media (max-width:600px){
   .pager__btn{flex:1}
   .pager__nums{order:-1;width:100%;justify-content:center}

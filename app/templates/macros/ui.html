@@ -32,11 +32,25 @@
 {% if j.destacado %}<span class="tag tag--hot">{{ icon("star") }} Más pedido</span>{% endif %}
 {%- endmacro %}
 
+{# Logo del header (el logo ya incluye el nombre; el link lo anuncia para lectores de pantalla) #}
 {% macro brand(cls="") -%}
 <a href="{{ url_for('public.inicio') }}" class="brand {{ cls }}" aria-label="{{ negocio.nombre }} - inicio">
-  <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="" width="44" height="44">
-  <span>{{ negocio.nombre }}</span>
+  <img src="{{ asset(marca.logo_grande) }}" alt="Logo {{ negocio.nombre }}" width="84" height="84">
 </a>
+{%- endmacro %}
+
+{# Nombre como logotipo de texto (footer): la última palabra va destacada, como en el logo #}
+{% macro wordmark(cls="") -%}
+{% set partes = negocio.nombre.rsplit(" ", 1) %}
+<a href="{{ url_for('public.inicio') }}" class="wordmark {{ cls }}" aria-label="{{ negocio.nombre }} - inicio">
+  {% if partes|length > 1 %}<span class="wordmark__top">{{ partes[0] }}</span>{% endif %}
+  <span class="wordmark__main">{{ partes[-1] }}</span>
+</a>
+{%- endmacro %}
+
+{# Guirnalda de banderines de feria (decorativa, colores del logo) #}
+{% macro bunting(n=48) -%}
+<div class="bunting" aria-hidden="true">{% for _ in range(n) %}<i></i>{% endfor %}</div>
 {%- endmacro %}
 
 {% macro section_head(eyebrow, titulo, texto=None, cls="") -%}

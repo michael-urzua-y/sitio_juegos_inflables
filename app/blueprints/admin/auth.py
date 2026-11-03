@@ -5,6 +5,8 @@ from flask_login import current_user, login_user, logout_user
 
 from app.extensions import db
 from app.models import Usuario
+from app.security import sellar_sesion
+from app.utils.limite import intentos_login
 
 from . import bp
 
@@ -18,14 +20,22 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for("admin.dashboard"))
     if request.method == "POST":
+        ip = request.remote_addr or "?"
+        if intentos_login.bloqueada(ip):
+            flash("Demasiados intentos desde esta conexión. Espera unos minutos e intenta nuevamente.", "error")
+            return render_template("admin/login.html"), 429
         user, error = Usuario.autenticar(
             request.form.get("username", "").strip()[:80], request.form.get("password", "")[:200]
         )
-        if user:
+        if not user:
+            intentos_login.fallo(ip)
+        else:
+            intentos_login.limpiar(ip)
             destino = request.args.get("next")
             session.clear()  # evita fijación de sesión
             session.permanent = True
             login_user(user, remember=bool(request.form.get("recordar")))
+            sellar_sesion()
             return redirect(destino if _url_interna(destino) else url_for("admin.dashboard"))
         flash(error, "error")
     return render_template("admin/login.html")
@@ -33,6 +43,8 @@ def login():
 
 @bp.route("/logout", methods=["POST"])
 def logout():
+    current_user.nueva_sesion()  # invalida también la cookie "recordarme" de este equipo
+    db.session.commit()
     logout_user()
     session.clear()
     flash("Sesión cerrada.", "info")

@@ -44,6 +44,9 @@ class Config:
     REMEMBER_COOKIE_SAMESITE = "Lax"
     REMEMBER_COOKIE_SECURE = SESSION_COOKIE_SECURE
     WTF_CSRF_TIME_LIMIT = 60 * 60 * 4
+    # La sesión del admin solo vale desde la IP y navegador donde se inició.
+    # Ponlo en 0 si el dueño usa datos móviles y su IP cambia seguido (lo sacaría a cada rato).
+    SESION_ATADA_IP = os.getenv("SESION_ATADA_IP", "1") == "1"
 
     SITIO_URL = os.getenv("SITIO_URL", "http://localhost:8000").rstrip("/")
     CREDITOS = "Monay Solutions"

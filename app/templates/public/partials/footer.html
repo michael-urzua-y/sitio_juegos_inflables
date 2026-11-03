@@ -1,8 +1,9 @@
-{% from "macros/ui.html" import icon, brand with context %}
+{% from "macros/ui.html" import icon, wordmark, bunting with context %}
 <footer class="footer" id="contacto">
+  {{ bunting() }}
   <div class="container footer__grid">
     <div class="footer__brand">
-      {{ brand("brand--light") }}
+      {{ wordmark() }}
       <p>{{ negocio.slogan }}. Diversión segura, puntual y con instalación incluida en {{ negocio.zona }}.</p>
       <div class="social">
         {% for red, url in [("instagram", negocio.instagram), ("facebook", negocio.facebook), ("whatsapp", wa_url())] if url %}

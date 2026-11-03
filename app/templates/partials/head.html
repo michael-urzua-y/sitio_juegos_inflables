@@ -1,8 +1,11 @@
 {# <head> común para sitio público y admin #}
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#5B21B6">
-<link rel="icon" href="{{ url_for('static', filename='img/logo.svg') }}" type="image/svg+xml">
+<meta name="theme-color" content="{{ marca.color_tema }}">
+{# Ícono de la pestaña (generados con scripts/generar_marca.py) #}
+<link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" sizes="48x48">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/favicon-32.png') }}">
+<link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">

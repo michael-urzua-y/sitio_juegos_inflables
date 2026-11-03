@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask
+from flask import Flask, g
 
 from app.config import INSTANCE_DIR, Config
 from app.extensions import compress, csrf, db, login_manager
@@ -40,14 +40,18 @@ def _init_extensiones(app):
     from app.models import Usuario
 
     @login_manager.user_loader
-    def cargar_usuario(token):
-        # token = "id:version"; si la contraseña cambió, la sesión antigua deja de ser válida
-        try:
-            uid, version = (int(x) for x in token.split(":"))
-        except ValueError:
+    def cargar_usuario(id_sesion):
+        # id_sesion = "id:token". Si el token ya no coincide, alguien inició sesión en otro
+        # equipo (o cerró sesión / cambió la contraseña) y esta sesión deja de ser válida.
+        uid, _, token = (id_sesion or "").partition(":")
+        if not uid.isdigit():
             return None
-        user = db.session.get(Usuario, uid)
-        return user if user and user.version_sesion == version else None
+        user = db.session.get(Usuario, int(uid))
+        if user and user.token_valido(token):
+            return user
+        if user:
+            g.sesion_reemplazada = True
+        return None
 
 
 def _registrar_blueprints(app):

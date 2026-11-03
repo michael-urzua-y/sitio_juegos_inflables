@@ -13,6 +13,7 @@ from . import data
 COLUMNAS_NUEVAS = [
     ("usuario", "rol", f"VARCHAR(20) NOT NULL DEFAULT '{ROL_ADMIN}'"),
     ("juego", "en_portada", "BOOLEAN NOT NULL DEFAULT FALSE"),
+    ("usuario", "token_sesion", "VARCHAR(64)"),
 ]
 
 

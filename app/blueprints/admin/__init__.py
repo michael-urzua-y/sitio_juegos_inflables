@@ -2,15 +2,18 @@
 Panel de administración en /admin.
 
 - Todas las rutas requieren login salvo /admin/login.
+- Una sola sesión activa por usuario: al entrar desde otro equipo, la anterior se cierra.
+  Además la sesión queda atada a la IP y navegador donde se inició (app/security.py).
 - Las rutas marcadas con @solo_superadmin solo las ve el equipo de desarrollo.
 - El menú se arma desde MENU según el rol del usuario.
 """
 from functools import wraps
 
-from flask import Blueprint, flash, redirect, request, url_for
-from flask_login import current_user
+from flask import Blueprint, flash, g, redirect, request, session, url_for
+from flask_login import current_user, logout_user
 
 from app.extensions import login_manager
+from app.security import sesion_del_mismo_equipo
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -43,7 +46,18 @@ def solo_superadmin(vista):
 
 @bp.before_request
 def requiere_login():
-    if request.endpoint not in RUTAS_PUBLICAS and not current_user.is_authenticated:
+    if current_user.is_authenticated:
+        if sesion_del_mismo_equipo():
+            return None
+        logout_user()
+        session.clear()
+        flash("Por seguridad se cerró la sesión: se detectó un cambio de red o navegador.", "info")
+        return redirect(url_for("admin.login"))
+    if g.pop("sesion_reemplazada", False):
+        flash("Tu sesión se cerró porque se inició sesión con tu usuario en otro equipo.", "info")
+        if request.endpoint not in RUTAS_PUBLICAS:
+            return redirect(url_for("admin.login"))
+    if request.endpoint not in RUTAS_PUBLICAS:
         return login_manager.unauthorized()
 
 

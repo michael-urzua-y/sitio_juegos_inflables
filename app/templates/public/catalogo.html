@@ -8,7 +8,7 @@
 {% set jsonld = seo.grafo(
      seo.migas([("Catálogo", url_catalogo())] + ([(categoria.nombre, url_catalogo(categoria))] if categoria else [])),
      seo.lista(paginacion.items, (paginacion.page - 1) * paginacion.per_page)) %}
-{% block title %}{% if categoria %}Arriendo de {{ categoria.nombre }} en {{ negocio.ciudad or negocio.zona }}{% else %}Catálogo: arriendo de juegos inflables y entretención{% endif %}{% if paginacion.page > 1 %} · Página {{ paginacion.page }}{% endif %} | {{ negocio.nombre }}{% endblock %}
+{% block title %}{% if categoria %}Arriendo de {{ categoria.nombre }} en {{ negocio.ciudad or negocio.zona }}{% else %}Catálogo: arriendo de juegos inflables y entretención{% endif %}{% if paginacion.page > 1 %} · Página {{ paginacion.page }}{% endif %}{% endblock %}
 {% block description %}{{ categoria.descripcion if categoria else "Juegos inflables, acuáticos, toboganes, juegos mecanizados, camas elásticas y máquinas para eventos." }} Arriendo en {{ negocio.zona }} con despacho e instalación. Cotiza por WhatsApp.{% endblock %}
 {% block content %}
 <section class="page-hero">

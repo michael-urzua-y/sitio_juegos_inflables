@@ -56,3 +56,10 @@ def resaltar(texto):
     """Escapa el texto y convierte *palabras* en <span class="hl"> (texto con degradado)."""
     from markupsafe import Markup, escape
     return Markup(re.sub(r"\*([^*]{1,80})\*", r'<span class="hl">\1</span>', str(escape(texto or ""))))
+
+
+def abreviar_nombre(nombre):
+    """'Entretenciones Santos' -> 'Ent. Santos': abrevia todas las palabras largas menos la última."""
+    palabras = (nombre or "").split()
+    cortas = [p[:3] + "." if len(p) > 5 else p for p in palabras[:-1]]
+    return " ".join(cortas + palabras[-1:])

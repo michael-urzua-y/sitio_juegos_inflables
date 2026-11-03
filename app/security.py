@@ -1,7 +1,10 @@
-"""Endurecimiento de seguridad: headers HTTP, CSP, chequeos de producción y errores CSRF."""
+"""Endurecimiento de seguridad: headers HTTP, CSP, chequeos de producción, errores CSRF y
+sesiones atadas al equipo (IP + navegador)."""
+import hashlib
+import hmac
 import os
 
-from flask import flash, redirect, request, url_for
+from flask import current_app, flash, redirect, request, session, url_for
 from flask_wtf.csrf import CSRFError
 from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -34,6 +37,30 @@ def _validar_produccion(app):
         errores.append("ADMIN_USER y SUPERADMIN_USER deben ser distintos.")
     if errores:
         raise RuntimeError("Configuración insegura:\n- " + "\n- ".join(errores))
+
+
+# ---------- Sesión atada al equipo ----------
+# Flask-Login trae algo parecido ("strong"), pero con sesiones permanentes no la cierra y
+# confía en la cabecera X-Forwarded-For, que cualquiera puede falsificar. Aquí se usa
+# request.remote_addr, que solo se corrige con ProxyFix cuando TRUST_PROXY=1.
+def _huella():
+    datos = f"{request.remote_addr}|{request.headers.get('User-Agent', '')}"
+    return hmac.new(current_app.secret_key.encode(), datos.encode(), hashlib.sha256).hexdigest()
+
+
+def sellar_sesion():
+    """Se llama al iniciar sesión: guarda la huella del equipo actual."""
+    session["huella"] = _huella()
+
+
+def sesion_del_mismo_equipo():
+    """False si la cookie de sesión se está usando desde otra IP o navegador."""
+    if not current_app.config["SESION_ATADA_IP"]:
+        return True
+    if "huella" not in session:  # sesión restaurada con la cookie "recordarme"
+        sellar_sesion()
+        return True
+    return hmac.compare_digest(session["huella"], _huella())
 
 
 def init_security(app):

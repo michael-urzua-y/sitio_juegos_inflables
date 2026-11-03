@@ -95,6 +95,7 @@ Usuarios iniciales en desarrollo: `admin` / `admin123` y `superadmin` / `superad
 │   ├── extensions.py          # db, login, CSRF, compresión
 │   ├── security.py            # headers de seguridad, CSP, validaciones de producción
 │   ├── seo_config.py          # SEO interno: título, palabras clave, descripción, ciudad
+│   ├── marca.py               # identidad: archivos del logo y color de tema
 │   ├── models/                # un archivo por modelo
 │   │   ├── juego.py  categoria.py  bloque.py  ajuste.py  usuario.py
 │   ├── services/              # lógica de consulta reutilizable
@@ -117,7 +118,9 @@ Usuarios iniciales en desarrollo: `admin` / `admin123` y `superadmin` / `superad
 │       ├── css/  core.css (compartido) · site.css · admin.css
 │       ├── js/   app.js (sitio) · admin.js (panel)
 │       ├── fonts/ Fredoka y Plus Jakarta Sans (licencia OFL, para las tarjetas)
-│       └── img/  logo.svg · logo-completo.svg · íconos · og-default.jpg · placeholders/
+│       └── img/  logo-128/320.webp · favicon · íconos PWA · og-default.jpg · placeholders/
+├── marca/logo-original.png    # logo fuente (no se publica; de aquí salen todos los íconos)
+├── scripts/generar_marca.py   # genera logo, favicon, íconos y tarjeta de redes desde el logo
 ├── wsgi.py                    # punto de entrada (gunicorn wsgi:app)
 ├── Dockerfile
 ├── docker-compose.yml         # web + PostgreSQL
@@ -180,7 +183,9 @@ Usuarios iniciales en desarrollo: `admin` / `admin123` y `superadmin` / `superad
 | XSS | Autoescape de Jinja, CSP estricta sin scripts inline, el carrito arma el DOM con `textContent` y las URLs de redes solo aceptan `http(s)://`. |
 | CSRF | Token CSRF en todos los formularios y acciones POST (Flask-WTF). |
 | Roles | Admin y super admin; las secciones restringidas se validan en el servidor (decorador `@solo_superadmin`). |
-| Login | Hash scrypt/PBKDF2, bloqueo de 15 min tras 5 intentos fallidos, mensajes genéricos, protección contra fijación de sesión, sesiones de 8 h y cierre de las demás sesiones al cambiar la contraseña. |
+| Login | Hash scrypt/PBKDF2, bloqueo de 15 min tras 5 intentos fallidos por usuario y tras 10 por IP, mensajes genéricos, protección contra fijación de sesión y sesiones de 8 h. |
+| Sesión única | Cada usuario tiene **una sola sesión activa**: al entrar desde otro equipo, la anterior se cierra con un aviso. El token es aleatorio y también cambia al cerrar sesión o cambiar la contraseña (invalida la cookie "recordarme"). |
+| Sesión atada al equipo | La sesión solo vale desde la IP y el navegador donde se inició; una cookie robada no sirve desde otro equipo. No se confía en `X-Forwarded-For` salvo con `TRUST_PROXY=1`. Se desactiva con `SESION_ATADA_IP=0`. |
 | Cookies | `HttpOnly`, `SameSite=Lax` y `Secure` con `COOKIE_SECURE=1`. |
 | Clickjacking / sniffing | `X-Frame-Options: DENY`, `frame-ancestors 'none'`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, HSTS en HTTPS. |
 | CORS | No hay API pública ni cabeceras CORS, así que el navegador bloquea las lecturas desde otros dominios por defecto. |
@@ -205,6 +210,7 @@ Usuarios iniciales en desarrollo: `admin` / `admin123` y `superadmin` / `superad
 | `TRUST_PROXY` | `1` si hay un proxy inverso delante. |
 | `SITIO_URL` | URL pública (para sitemap y Open Graph). |
 | `CREDITOS_URL` | Enlace de "Sitio creado por Monay Solutions". |
+| `SESION_ATADA_IP` | `1` (por defecto): la sesión del admin solo vale desde la IP y navegador donde se inició. `0` si la IP de quien administra cambia seguido. |
 | `WEB_CONCURRENCY` | Número de workers de gunicorn (por defecto 3). |
 | `GOOGLE_VERIFICACION` / `BING_VERIFICACION` / `FACEBOOK_VERIFICACION` | Códigos de verificación de propiedad (SEO). |
 
@@ -212,6 +218,6 @@ Usuarios iniciales en desarrollo: `admin` / `admin123` y `superadmin` / `superad
 
 ## Personalización rápida
 
-- **Logo**: reemplaza `app/static/img/logo.svg` (ícono) y `logo-completo.svg` (con texto, para redes sociales).
-- **Colores**: edita las variables al inicio de `app/static/css/core.css` (`--primary`, `--accent`, etc.).
+- **Logo**: reemplaza `marca/logo-original.png` (cuadrado, ideal ≥1000 px, fondo negro o transparente) y ejecuta `python scripts/generar_marca.py`. Genera el logo con fondo transparente para header/footer/admin, `favicon.ico`, ícono de iPhone, íconos PWA (incluido *maskable*) y la tarjeta `og-default.jpg` para redes.
+- **Colores**: la paleta sale del logo (azul rey, rojo, amarillo y naranja sobre noche de feria). Se edita en las variables al inicio de `app/static/css/core.css` (`--primary`, `--accent`, `--red`, `--gold`, `--night`…); el color de la barra del navegador está en `app/marca.py`. Si cambias el diseño de las tarjetas de redes, sube `VERSION` en `app/services/tarjetas.py`.
 - **Destacar una palabra del título**: en *Textos y contacto*, enciérrala entre asteriscos: `Juegos que hacen tu evento *inolvidable*`.

@@ -1,4 +1,6 @@
 import hashlib
+import hmac
+import secrets
 from datetime import datetime, timedelta
 
 from flask_login import UserMixin
@@ -24,8 +26,11 @@ class Usuario(UserMixin, db.Model):
     intentos_fallidos = db.Column(db.Integer, default=0, nullable=False)
     bloqueado_hasta = db.Column(db.DateTime)
     ultimo_login = db.Column(db.DateTime)
-    # Cambia al modificar la contraseña: invalida sesiones y cookies "recordarme" anteriores
+    # Obsoleta (reemplazada por token_sesion); se mantiene para no romper bases ya creadas
     version_sesion = db.Column(db.Integer, default=1, nullable=False)
+    # Token aleatorio de la sesión activa. Cambia al iniciar sesión, cerrarla o cambiar la
+    # contraseña: así solo existe UNA sesión válida por usuario (la última que entró).
+    token_sesion = db.Column(db.String(64))
 
     @property
     def es_superadmin(self):
@@ -36,11 +41,18 @@ class Usuario(UserMixin, db.Model):
         self.bloqueado_hasta = None
 
     def get_id(self):
-        return f"{self.id}:{self.version_sesion}"
+        return f"{self.id}:{self.token_sesion}"
+
+    def nueva_sesion(self):
+        """Genera un token nuevo: cualquier otra sesión o cookie "recordarme" deja de valer."""
+        self.token_sesion = secrets.token_urlsafe(32)
+
+    def token_valido(self, token):
+        return bool(self.token_sesion) and hmac.compare_digest(self.token_sesion, token or "")
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password, method=HASH_METHOD)
-        self.version_sesion = (self.version_sesion or 0) + 1
+        self.nueva_sesion()
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
@@ -74,5 +86,6 @@ class Usuario(UserMixin, db.Model):
             db.session.commit()
             return None, "Usuario o contraseña incorrectos."
         user.registrar_exito()
+        user.nueva_sesion()  # cierra la sesión que estuviera abierta en otro equipo
         db.session.commit()
         return user, None

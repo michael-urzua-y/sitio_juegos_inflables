@@ -6,6 +6,7 @@ from urllib.parse import quote
 
 from flask import current_app, url_for
 
+from app.marca import MARCA
 from app.services import ajustes, catalogo, seo, tarjetas
 from app.utils.imagenes import ANCHOS, nombre_archivo
 from app.utils.comunas import COMUNAS_RM
@@ -89,6 +90,7 @@ def registrar(app):
     def globales():
         return {
             "negocio": ajustes.obtener(),
+            "marca": MARCA,
             "categorias": catalogo.categorias(),
             "imagen_juego": imagen_juego,
             "srcset_juego": srcset_juego,

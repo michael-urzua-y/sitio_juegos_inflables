@@ -6,7 +6,7 @@
   {% include "partials/head.html" %}
   <meta name="robots" content="noindex, nofollow">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>{% block title %}Admin{% endblock %} · {{ negocio.nombre }}</title>
+  <title>{% block title %}Admin{% endblock %} · {{ negocio.nombre_corto }}</title>
   <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 </head>
 <body class="{% block body_class %}{% endblock %}">
@@ -15,7 +15,7 @@
   <div class="shell">
     <aside class="side">
       <a class="side__brand" href="{{ url_for('admin.dashboard') }}">
-        <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="" width="36" height="36"><span>Panel admin</span>
+        <img src="{{ asset(marca.logo) }}" alt="" width="44" height="44"><span>Panel admin</span>
       </a>
       <nav class="side__nav">
         {% for ep, label, ic, activos, _solo_super, args in menu %}

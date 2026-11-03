@@ -4,6 +4,7 @@ from xml.sax.saxutils import escape
 from flask import (Response, current_app, render_template, request, send_file,
                    send_from_directory, url_for)
 
+from app.marca import MARCA
 from app.models import Categoria
 from app.services import ajustes, catalogo, seo, tarjetas
 from app.utils.plantillas import og_imagen_juego
@@ -126,13 +127,22 @@ def llms():
 @bp.route("/site.webmanifest")
 def manifest():
     n = ajustes.obtener()
-    icono = lambda t: {"src": url_for("static", filename=f"img/icon-{t}.png"), "sizes": f"{t}x{t}", "type": "image/png"}
+    def icono(archivo, lado, proposito="any"):
+        return {"src": url_for("static", filename=f"img/{archivo}"), "sizes": f"{lado}x{lado}",
+                "type": "image/png", "purpose": proposito}
     return {
-        "name": n["nombre"], "short_name": n["nombre"][:12], "description": seo.descripcion_negocio(),
+        "name": n["nombre"], "short_name": n["nombre_corto"], "description": seo.descripcion_negocio(),
         "lang": "es-CL", "start_url": "/", "display": "standalone",
-        "background_color": "#ffffff", "theme_color": "#5B21B6",
-        "icons": [icono(192), icono(512)],
+        "background_color": MARCA["color_tema"], "theme_color": MARCA["color_tema"],
+        "icons": [icono("icon-192.png", 192), icono("icon-512.png", 512),
+                  icono("icon-maskable-512.png", 512, "maskable")],
     }
+
+
+@bp.route("/favicon.ico")
+def favicon():
+    """Navegadores y Google piden el ícono en la raíz aunque el HTML indique otra ruta."""
+    return send_from_directory(current_app.static_folder, "img/favicon.ico", max_age=60 * 60 * 24 * 30)
 
 
 @bp.app_errorhandler(404)

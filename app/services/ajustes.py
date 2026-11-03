@@ -6,13 +6,14 @@ from flask import current_app, g
 from app.extensions import db
 from app.models import Ajuste
 from app.seo_config import SEO
-from app.utils.texto import email_valido, recortar, solo_digitos, url_segura
+from app.utils.texto import abreviar_nombre, email_valido, recortar, solo_digitos, url_segura
 
 # (grupo, [(clave, etiqueta, tipo_input)])
 # Textos del sitio: los edita el super admin
 GRUPOS_TEXTOS = [
     ("Marca", [
         ("nombre", "Nombre del negocio", "text"),
+        ("nombre_corto", "Nombre corto: panel admin e ícono en el celular (vacío = automático: «Ent. Santos»)", "text"),
         ("razon_social", "Razón social (aparece en el footer)", "text"),
         ("slogan", "Slogan", "text"),
     ]),
@@ -54,6 +55,7 @@ def obtener():
         cfg = current_app.config
         g.ajustes = editables()
         g.ajustes.update(SEO)  # el SEO no es editable por el cliente
+        g.ajustes["nombre_corto"] = g.ajustes["nombre_corto"] or abreviar_nombre(g.ajustes["nombre"])
         g.ajustes.update(url=cfg["SITIO_URL"], creditos=cfg["CREDITOS"], creditos_url=cfg["CREDITOS_URL"])
     return g.ajustes
 

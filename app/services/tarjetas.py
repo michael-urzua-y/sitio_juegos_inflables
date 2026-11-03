@@ -23,8 +23,8 @@ ANCHO, ALTO = 1200, 630
 MARGEN = 72
 COL_TEXTO = 570           # ancho de la columna de texto
 FOTO = (440, 330)         # tamaño de la foto a la derecha
-NARANJA = ((255, 122, 26), (244, 63, 94))
-VERSION = "1"             # súbelo si cambias el diseño para invalidar la caché
+NARANJA = ((229, 32, 46), (255, 138, 0))   # rojo -> naranja del logo (= .btn--accent)
+VERSION = "2"             # súbelo si cambias el diseño para invalidar la caché
 
 
 # ---------- utilidades de dibujo ----------
@@ -112,7 +112,7 @@ def _foto(lienzo, ruta):
     marco.alpha_composite(foto, (borde, borde))
 
     sombra = Image.new("RGBA", (marco.width + 120, marco.height + 120), (0, 0, 0, 0))
-    ImageDraw.Draw(sombra).rounded_rectangle((60, 80, 60 + marco.width, 80 + marco.height), 32, fill=(10, 0, 30, 150))
+    ImageDraw.Draw(sombra).rounded_rectangle((60, 80, 60 + marco.width, 80 + marco.height), 32, fill=(7, 11, 30, 150))
     sombra = sombra.filter(ImageFilter.GaussianBlur(28))
 
     angulo = 3
@@ -130,9 +130,9 @@ def _componer(etiqueta, titulo, destacado, ruta_foto):
     d = ImageDraw.Draw(lienzo)
 
     # Marca: logo + nombre
-    logo = Image.open(_static("img", "icon-192.png")).convert("RGBA").resize((76, 76), Image.LANCZOS)
-    lienzo.alpha_composite(logo, (MARGEN, 56))
-    d.text((MARGEN + 94, 74), n["nombre"], font=_fuente("Fredoka", "SemiBold", 36), fill="white")
+    logo = Image.open(_static("img", "icon-192.png")).convert("RGBA").resize((100, 100), Image.LANCZOS)
+    lienzo.alpha_composite(logo, (MARGEN - 8, 40))
+    d.text((MARGEN + 104, 66), n["nombre"], font=_fuente("Fredoka", "SemiBold", 36), fill="white")
 
     # Etiqueta (categoría)
     y = 176
