@@ -19,7 +19,8 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True}
     UPLOAD_DIR = os.path.join(INSTANCE_DIR, "uploads")
-    MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10 MB por request
+    MAX_UPLOAD_MB = 25  # fotos de celular modernas pueden pesar 10-20 MB
+    MAX_CONTENT_LENGTH = MAX_UPLOAD_MB * 1024 * 1024
 
     # Rendimiento: estáticos cacheados 1 año (las URLs llevan ?v= de versión)
     SEND_FILE_MAX_AGE_DEFAULT = 60 * 60 * 24 * 365

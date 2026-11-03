@@ -46,11 +46,19 @@ def _guardar(juego):
     if not nombre or not categoria_id or not db.session.get(Categoria, categoria_id):
         flash("Nombre y categoría son obligatorios.", "error")
         return False
+    if "en_portada" in f:
+        otros = catalogo.en_portada(excluir_id=juego.id)
+        if len(otros) >= Juego.MAX_PORTADA:
+            nombres = ", ".join(f"“{j.nombre}”" for j in otros)
+            flash(f"La portada ya tiene {Juego.MAX_PORTADA} juegos ({nombres}). Desmarca uno de ellos primero.", "error")
+            return False
     try:
-        nueva_imagen = guardar_imagen(request.files.get("imagen"))
+        nueva_imagen, aviso = guardar_imagen(request.files.get("imagen"))
     except ImagenInvalida as e:
         flash(str(e), "error")
         return False
+    if aviso:
+        flash(aviso, "info")
 
     if juego.nombre != nombre:
         juego.slug = slug_unico(Juego, nombre, juego.id)
@@ -59,6 +67,7 @@ def _guardar(juego):
     juego.precio = max(0, min(a_entero(f.get("precio")), 100_000_000))
     juego.orden = max(-999, min(a_entero(f.get("orden")), 999))
     juego.destacado = "destacado" in f
+    juego.en_portada = "en_portada" in f
     juego.activo = "activo" in f
     asignar_textos(juego, f, Juego.CAMPOS_TEXTO)
 
@@ -75,7 +84,8 @@ def _formulario(juego, accion):
     if request.method == "POST" and _guardar(juego):
         flash(f"“{juego.nombre}” fue {accion}.", "ok")
         return redirect(url_for("admin.dashboard"))
-    return render_template("admin/juego_form.html", juego=juego)
+    return render_template("admin/juego_form.html", juego=juego,
+                           portada_actual=catalogo.en_portada(excluir_id=juego.id))
 
 
 @bp.route("/juegos/nuevo", methods=["GET", "POST"])

@@ -45,6 +45,7 @@
           <div class="cell-game">
             <img src="{{ imagen_juego(j, 480) }}" alt="" width="64" height="48" loading="lazy">
             <div><a class="cell-game__name" href="{{ url_for('admin.juego_editar', id=j.id) }}">{{ j.nombre }}</a>
+              {% if j.en_portada %}<span class="badge badge--portada">En portada</span>{% endif %}
               {% if j.destacado %}<span class="badge badge--star">★ Destacado</span>{% endif %}
               {% if not j.imagen %}<span class="badge">Sin foto</span>{% endif %}</div>
           </div>

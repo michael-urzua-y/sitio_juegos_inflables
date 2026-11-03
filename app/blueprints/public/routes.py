@@ -14,7 +14,7 @@ from . import bp
 
 @bp.route("/")
 def inicio():
-    return render_template("public/index.html", destacados=catalogo.destacados(),
+    return render_template("public/index.html", destacados=catalogo.destacados(), portada=catalogo.portada(),
                            total=catalogo.total_activos(), bloques=bloques_por_tipo())
 
 
@@ -142,4 +142,4 @@ def no_encontrado(_e):
 
 @bp.app_errorhandler(413)
 def muy_grande(_e):
-    return "La imagen supera el tamaño máximo permitido (10 MB).", 413
+    return f"La foto supera el tamaño máximo permitido ({current_app.config['MAX_UPLOAD_MB']} MB).", 413

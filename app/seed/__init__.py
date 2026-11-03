@@ -9,13 +9,31 @@ from app.models.usuario import ROL_ADMIN, ROL_SUPERADMIN
 from . import data
 
 
+# Columnas agregadas después de la primera versión: (tabla, columna, definición SQL)
+COLUMNAS_NUEVAS = [
+    ("usuario", "rol", f"VARCHAR(20) NOT NULL DEFAULT '{ROL_ADMIN}'"),
+    ("juego", "en_portada", "BOOLEAN NOT NULL DEFAULT FALSE"),
+]
+
+
 def _migrar_columnas():
-    """Agrega columnas nuevas a tablas existentes (create_all no modifica tablas ya creadas)."""
+    """Agrega columnas nuevas a tablas existentes (create_all no modifica tablas ya creadas).
+    Devuelve las columnas agregadas en esta ejecución."""
     from sqlalchemy import inspect, text
-    columnas = {c["name"] for c in inspect(db.engine).get_columns("usuario")}
-    if "rol" not in columnas:
-        with db.engine.begin() as con:
-            con.execute(text(f"ALTER TABLE usuario ADD COLUMN rol VARCHAR(20) NOT NULL DEFAULT '{ROL_ADMIN}'"))
+    insp, agregadas = inspect(db.engine), []
+    for tabla, columna, definicion in COLUMNAS_NUEVAS:
+        if columna not in {c["name"] for c in insp.get_columns(tabla)}:
+            with db.engine.begin() as con:
+                con.execute(text(f"ALTER TABLE {tabla} ADD COLUMN {columna} {definicion}"))
+            agregadas.append((tabla, columna))
+    return agregadas
+
+
+def _marcar_portada_inicial():
+    """Al crear la columna en_portada, marca los juegos que ya se veían en la portada."""
+    from app.services import catalogo
+    for juego in catalogo.portada():
+        juego.en_portada = True
 
 
 def _usuarios():
@@ -56,6 +74,11 @@ def _catalogo():
     for i, j in enumerate(data.JUEGOS):
         j = dict(j)
         db.session.add(Juego(categoria=cats[j.pop("categoria")], orden=(i % 3) + 1, **j))
+    db.session.flush()
+    for slug in data.PORTADA:
+        juego = Juego.query.filter_by(slug=slug).first()
+        if juego:
+            juego.en_portada = True
 
 
 def recargar_catalogo():
@@ -84,7 +107,10 @@ def registrar_comandos(app):
 
 def inicializar_db():
     db.create_all()
-    _migrar_columnas()
+    agregadas = _migrar_columnas()
     for paso in (_usuarios, _ajustes, _bloques, _catalogo):
         paso()
+    db.session.flush()
+    if ("juego", "en_portada") in agregadas:
+        _marcar_portada_inicial()
     db.session.commit()

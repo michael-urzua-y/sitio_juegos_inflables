@@ -58,6 +58,9 @@ CATEGORIAS = [
      "descripcion": "Diversión refrescante para disfrutar al máximo."},
 ]
 
+# Juegos que aparecen en las tarjetas grandes de la portada (máximo 3)
+PORTADA = ["castillo-princesas", "toro-mecanico", "tobogan-acuatico-tropical"]
+
 # Juegos de ejemplo (valores referenciales). Se reemplazan desde /admin.
 JUEGOS = [
     # --- Inflables ---

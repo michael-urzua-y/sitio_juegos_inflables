@@ -15,11 +15,15 @@ class Juego(db.Model):
     descripcion = db.Column(db.Text, default="")
     imagen = db.Column(db.String(255))  # archivo en instance/uploads
     destacado = db.Column(db.Boolean, default=False)
+    # Aparece en las tarjetas grandes de la portada (máximo MAX_PORTADA juegos)
+    en_portada = db.Column(db.Boolean, nullable=False, default=False, server_default=db.false())
     activo = db.Column(db.Boolean, default=True)
     orden = db.Column(db.Integer, default=0)
     actualizado = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     categoria = db.relationship("Categoria", back_populates="juegos")
+
+    MAX_PORTADA = 3
 
     # Campos de texto simples que se editan desde el formulario admin
     CAMPOS_TEXTO = ("medidas", "edad", "capacidad", "descripcion")

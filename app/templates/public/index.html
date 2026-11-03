@@ -21,7 +21,7 @@
       </ul>
     </div>
     <div class="hero__art" aria-hidden="true">
-      {% for j in destacados[:3] %}
+      {% for j in portada %}
       <figure class="hero__img hero__img--{{ loop.index }}">
         {{ img_juego(j, sizes="(max-width: 600px) 60vw, 360px", lazy=false, alt="") }}
         <figcaption>{{ j.nombre }} <b>{{ j.precio|clp }}</b></figcaption>

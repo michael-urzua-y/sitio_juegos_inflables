@@ -86,11 +86,36 @@
     });
   }
 
+  // ---------- Foto del juego: vista previa y validación de tamaño ----------
   var file = document.querySelector("[data-file]");
   var preview = document.querySelector("[data-preview]");
+  var fileMsg = document.querySelector("[data-file-msg]");
   if (file && preview) {
+    var textoAyuda = fileMsg ? fileMsg.textContent : "";
+    var mensaje = function (texto, tipo) {
+      if (!fileMsg) return;
+      fileMsg.textContent = texto;
+      fileMsg.className = "muted small upload-help" + (tipo ? " upload-help--" + tipo : "");
+    };
     file.addEventListener("change", function () {
-      if (file.files && file.files[0]) preview.src = URL.createObjectURL(file.files[0]);
+      var f = file.files && file.files[0];
+      if (!f) { mensaje(textoAyuda); return; }
+      var maxMb = Number(file.dataset.maxMb) || 25;
+      if (f.size > maxMb * 1024 * 1024) {
+        file.value = "";
+        mensaje("La foto pesa " + (f.size / 1048576).toFixed(1) + " MB y el máximo es " + maxMb + " MB. Elige otra o envíatela comprimida (por ejemplo por WhatsApp).", "error");
+        return;
+      }
+      var esHeic = /\.(heic|heif)$/i.test(f.name) || /heic|heif/i.test(f.type);
+      if (esHeic) {
+        // Los navegadores no muestran HEIC: se convierte al guardar
+        mensaje("Foto de iPhone (HEIC) lista: se convertirá automáticamente al guardar. La vista previa aparecerá después de guardar.", "ok");
+        return;
+      }
+      var url = URL.createObjectURL(f);
+      preview.onerror = function () { mensaje("No se puede previsualizar este formato, pero se convertirá al guardar.", "ok"); };
+      preview.src = url;
+      mensaje("“" + f.name + "” lista. Se ajustará y optimizará al guardar.", "ok");
     });
   }
 })();

@@ -98,6 +98,12 @@ body{background:var(--tint)}
 .cell-game img{width:64px;height:48px;object-fit:cover;border-radius:10px;flex-shrink:0}
 .badge{display:inline-block;margin:.2rem .3rem 0 0;padding:.1rem .5rem;border-radius:999px;font-size:.7rem;font-weight:700;background:var(--tint);color:var(--muted)}
 .badge--star{background:#FFF7ED;color:#C2410C}
+.badge--portada{background:var(--primary-50);color:var(--primary)}
+.upload-help{margin:.6rem 0 .75rem;line-height:1.5}
+.upload-help--ok{color:#166534;font-weight:600}
+.upload-help--error{color:#B91C1C;font-weight:600}
+.portada-info{margin:-.25rem 0 .9rem}
+.portada-info a{color:var(--primary);font-weight:600}
 .status{border:0;border-radius:999px;padding:.35rem .8rem;font-size:.8rem;font-weight:700}
 .status--on{background:#DCFCE7;color:#15803D}
 .status--off{background:#F1F5F9;color:#64748B}

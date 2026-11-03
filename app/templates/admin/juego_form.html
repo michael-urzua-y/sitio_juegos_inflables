@@ -45,16 +45,26 @@
       <h2>Imagen</h2>
       <label class="upload">
         <img src="{{ imagen_juego(juego) }}" alt="" data-preview>
-        <input type="file" name="imagen" accept="image/jpeg,image/png,image/webp" data-file>
-        <span class="upload__hint">{{ icon("plus") }} Subir foto (JPG, PNG o WebP · máx 10 MB)</span>
+        <input type="file" name="imagen" accept="image/*,.heic,.heif" data-file data-max-mb="{{ config.MAX_UPLOAD_MB }}">
+        <span class="upload__hint">{{ icon("plus") }} {{ 'Cambiar foto' if juego.imagen else 'Subir foto' }}</span>
       </label>
-      <p class="muted small">Se optimiza automáticamente. Recomendado: foto horizontal (4:3).</p>
+      <p class="muted small upload-help" data-file-msg>
+        Sube cualquier foto (también las de iPhone), hasta {{ config.MAX_UPLOAD_MB }} MB.
+        Se ajusta sola al tamaño de las tarjetas sin cortar el juego y sin perder calidad.
+        Ideal: foto horizontal, bien iluminada y de al menos 1200 px.
+      </p>
       {% if juego.imagen %}{{ check("quitar_imagen", "Quitar foto y usar imagen referencial") }}{% endif %}
     </div>
     <div class="panel">
       <h2>Publicación</h2>
       {{ check("activo", "Visible en el sitio", juego.activo) }}
       {{ check("destacado", "Destacado (“Más pedido”)", juego.destacado) }}
+      {{ check("en_portada", "Mostrar en la portada (tarjetas grandes, máx. " ~ juego.MAX_PORTADA ~ ")", request.form.get("en_portada") if request.method == "POST" else juego.en_portada) }}
+      <p class="muted small portada-info">
+        {% if portada_actual %}En portada ahora ({{ portada_actual|length }}/{{ juego.MAX_PORTADA }}):
+          {% for p in portada_actual %}<a href="{{ url_for('admin.juego_editar', id=p.id) }}">{{ p.nombre }}</a>{{ ", " if not loop.last }}{% endfor %}
+        {% else %}Aún no hay juegos elegidos para la portada.{% endif %}
+      </p>
       {{ field("orden", "Orden dentro de su categoría", juego.orden or 0, type="number", min=-999, max=999) }}
       <p class="muted small">Número menor aparece primero.</p>
     </div>

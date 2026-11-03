@@ -50,15 +50,38 @@ def buscar(categoria_id=None, texto="", pagina=1, por_pagina=POR_PAGINA, solo_ac
     return q.paginate(page=pagina, per_page=por_pagina, error_out=False)
 
 
-def destacados(limite=LIMITE_DESTACADOS):
-    """Siempre `limite` juegos (grilla pareja): primero los destacados y, si faltan,
-    se completa con el resto del catálogo en su orden normal."""
-    elegidos = _ordenados().filter(Juego.destacado.is_(True)).limit(limite).all()
+def _completar(elegidos, limite):
+    """Completa la lista hasta `limite` con el resto del catálogo (orden normal), sin repetir."""
     if len(elegidos) < limite:
         ids = [j.id for j in elegidos]
         resto = _ordenados().filter(Juego.id.notin_(ids)) if ids else _ordenados()
         elegidos += resto.limit(limite - len(elegidos)).all()
     return elegidos
+
+
+def destacados(limite=LIMITE_DESTACADOS):
+    """Siempre `limite` juegos (grilla pareja): primero los destacados y luego el resto."""
+    return _completar(_ordenados().filter(Juego.destacado.is_(True)).limit(limite).all(), limite)
+
+
+def portada(limite=Juego.MAX_PORTADA):
+    """Juegos de las tarjetas grandes de la portada: los marcados "Mostrar en la portada"
+    (en su orden); si faltan, se completa con destacados y luego con el resto."""
+    elegidos = (Juego.query.filter(Juego.activo.is_(True), Juego.en_portada.is_(True))
+                .order_by(Juego.orden, Juego.nombre).limit(limite).all())
+    if len(elegidos) < limite:
+        ids = [j.id for j in elegidos]
+        extra = _ordenados().filter(Juego.destacado.is_(True))
+        extra = extra.filter(Juego.id.notin_(ids)) if ids else extra
+        elegidos += extra.limit(limite - len(elegidos)).all()
+    return _completar(elegidos, limite)
+
+
+def en_portada(excluir_id=None):
+    q = Juego.query.filter(Juego.activo.is_(True), Juego.en_portada.is_(True))
+    if excluir_id:
+        q = q.filter(Juego.id != excluir_id)
+    return q.order_by(Juego.orden, Juego.nombre).all()
 
 
 def total_activos():
