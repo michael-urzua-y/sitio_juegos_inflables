@@ -1,0 +1,58 @@
+# Entretenciones Santos en el VPS de serviciohyh.cl → https://inflables.serviciohyh.cl
+#
+# Corre detrás del nginx existente del VPS (hyh-nginx) sin tocar el sitio "taller":
+#  - Ningún puerto publicado: solo inflables-web entra a la red del nginx (taller_default).
+#  - PostgreSQL queda en una red interna propia.
+#  - Ningún servicio en la red compartida se llama "web": Docker registra el nombre del
+#    servicio como alias y chocaría con el "web" del sitio existente.
+#
+# Toda la configuración (claves, base de datos, URL) está en el .env de la raíz del repo,
+# que crea deploy/serviciohyh/crear-env.sh. Uso: ver deploy/serviciohyh/README.md
+
+name: inflables
+
+services:
+  inflables-db:
+    image: postgres:16-alpine
+    container_name: inflables-db
+    restart: unless-stopped
+    env_file: ../../.env
+    # Poca memoria: el VPS es compartido (~3,8 GB) y el sitio tiene poco tráfico de escritura
+    command: >
+      postgres
+      -c shared_buffers=64MB
+      -c effective_cache_size=192MB
+      -c work_mem=4MB
+      -c maintenance_work_mem=16MB
+      -c max_connections=30
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [internal]
+
+  inflables-web:
+    build: ../..
+    image: inflables-web
+    container_name: inflables-web
+    restart: unless-stopped
+    env_file: ../../.env
+    volumes:
+      - uploads:/data        # fotos subidas desde el admin
+    depends_on:
+      inflables-db:
+        condition: service_healthy
+    networks: [internal, proxy]
+
+volumes:
+  pgdata:
+  uploads:
+
+networks:
+  internal:
+  proxy:
+    name: ${PROXY_NETWORK:-taller_default}
+    external: true
