@@ -17,7 +17,7 @@
 .brand{position:relative;z-index:1;align-self:stretch;width:var(--logo);flex-shrink:0}
 .brand img{position:absolute;left:0;top:var(--logo-top);width:var(--logo);height:var(--logo);max-width:none;filter:drop-shadow(0 6px 14px rgba(7,11,30,.45)) drop-shadow(0 0 14px rgba(255,195,30,.35));transition:width .3s var(--ease),height .3s var(--ease),top .3s var(--ease),transform .3s var(--ease)}
 .brand:hover img{transform:rotate(-6deg) scale(1.06)}
-.header.is-scrolled .brand img{width:calc(var(--header-h) - 10px);height:calc(var(--header-h) - 10px);top:5px}
+.header.is-scrolled .brand img,.header.menu-open .brand img{width:calc(var(--header-h) - 10px);height:calc(var(--header-h) - 10px);top:5px}
 /* Lo que va justo bajo el header deja espacio para el logo que cuelga (el hero ya tiene padding de sobra) */
 #contenido > :first-child:not(.hero) > .container{padding-top:var(--logo-overhang)}
 .nav{display:flex;align-items:center;gap:.25rem;margin-left:auto}
@@ -43,6 +43,10 @@
 @keyframes neon{to{background-position:200% 0}}
 @keyframes swing{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
 .burger{display:none;width:44px;height:44px;border-radius:12px;border:0;background:rgba(255,255,255,.1);color:#fff;place-items:center}
+.burger .ic{grid-area:1/1;transition:opacity .2s,transform .3s var(--ease)}
+.burger__close{opacity:0;transform:rotate(-90deg)}
+.burger[aria-expanded="true"] .burger__open{opacity:0;transform:rotate(90deg)}
+.burger[aria-expanded="true"] .burger__close{opacity:1;transform:none}
 
 /* =========================================================
    Hero
@@ -317,7 +321,9 @@ body.no-scroll{overflow:hidden}
   .header__actions{margin-left:auto}
   .nav{position:fixed;top:var(--header-h);left:0;right:0;bottom:0;flex-direction:column;align-items:stretch;gap:.25rem;padding:1rem 1.25rem 2rem;background:var(--night);overflow-y:auto;transform:translateX(100%);transition:transform .3s var(--ease);margin:0}
   .nav.is-open{transform:none}
-  .nav__link{padding:1rem;font-size:1.05rem;justify-content:space-between;width:100%;border-radius:14px}
+  .nav{padding-top:1.25rem;gap:.35rem}
+  .nav__link{padding:1rem 1.1rem;font-size:1.05rem;justify-content:space-between;width:100%;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)}
+  .nav__link:hover,.nav__drop.is-open > .nav__link{background:rgba(255,255,255,.09);color:var(--gold)}
   .drop{position:static;transform:none;width:100%;grid-template-columns:1fr;box-shadow:none;border:0;padding:0 0 0 .5rem;opacity:1;visibility:visible;display:none}
   .nav__drop.is-open .drop{display:grid;transform:none}
   .nav__drop:hover .drop{transform:none}

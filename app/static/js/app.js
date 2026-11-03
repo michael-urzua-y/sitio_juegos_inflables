@@ -20,6 +20,7 @@
   var burger = $("[data-burger]");
   var setMenu = function (open) {
     nav.classList.toggle("is-open", open);
+    header.classList.toggle("menu-open", open);
     burger.setAttribute("aria-expanded", String(open));
     document.body.classList.toggle("no-scroll", open);
   };

@@ -1,5 +1,5 @@
 {% from "macros/ui.html" import icon with context %}
-{% from "macros/forms.html" import post_button %}
+{% from "macros/forms.html" import csrf %}
 <!DOCTYPE html>
 <html lang="es-CL">
 <head>
@@ -15,7 +15,7 @@
   <div class="shell">
     <aside class="side">
       <a class="side__brand" href="{{ url_for('admin.dashboard') }}">
-        <img src="{{ asset(marca.logo) }}" alt="" width="44" height="44"><span>Panel admin</span>
+        <img src="{{ asset(marca.logo_grande) }}" alt="" width="64" height="64"><span>Panel admin<small>{{ negocio.nombre_corto }}</small></span>
       </a>
       <nav class="side__nav">
         {% for ep, label, ic, activos, _solo_super, args in menu %}
@@ -25,7 +25,10 @@
       <div class="side__foot">
         <a href="{{ url_for('public.inicio') }}" target="_blank" rel="noopener" class="btn btn--ghost btn--block">{{ icon("arrow") }} Ver sitio</a>
         <p class="side__user">{{ current_user.username }} · <span>{{ 'Super admin' if current_user.es_superadmin else 'Administrador' }}</span></p>
-        {{ post_button(url_for('admin.logout'), "Cerrar sesión", "btn btn--link btn--block") }}
+        <form method="post" action="{{ url_for('admin.logout') }}" class="inline-form">
+          {{ csrf() }}
+          <button class="btn btn--block btn--logout" type="submit">{{ icon("logout") }} Cerrar sesión</button>
+        </form>
       </div>
     </aside>
     <div class="main">

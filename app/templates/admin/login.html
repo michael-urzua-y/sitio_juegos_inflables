@@ -5,7 +5,7 @@
 <main class="login">
   <form class="login__card" method="post" autocomplete="on">
     {{ csrf() }}
-    <img src="{{ asset(marca.logo_grande) }}" alt="Logo {{ negocio.nombre }}" width="120" height="120">
+    <img src="{{ asset(marca.logo_grande) }}" alt="Logo {{ negocio.nombre }}" width="176" height="176">
     <h1>Panel de administración</h1>
     <p class="muted">{{ negocio.nombre }}</p>
     {% include "admin/partials/flash.html" %}
