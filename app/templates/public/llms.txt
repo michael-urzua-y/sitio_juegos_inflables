@@ -2,7 +2,7 @@
 
 > {{ seo.descripcion_negocio() }}
 
-{{ negocio.razon_social or negocio.nombre }} ofrece arriendo de juegos inflables y entretención para cumpleaños, colegios, empresas y eventos en {{ negocio.zona }}{% if negocio.ciudad %} ({{ negocio.ciudad }}{% if negocio.region %}, {{ negocio.region }}{% endif %}, Chile){% endif %}. Los arriendos incluyen despacho, instalación y retiro. Las cotizaciones se hacen por WhatsApp.
+{{ negocio.razon_social or negocio.nombre }} es una empresa de entretención para eventos: cumpleaños, colegios, empresas y celebraciones en {{ negocio.zona }}{% if negocio.ciudad %} ({{ negocio.ciudad }}{% if negocio.region %}, {{ negocio.region }}{% endif %}, Chile){% endif %}. Ofrece {{ categorias|length }} líneas de entretención ({{ categorias|map(attribute="nombre")|join(", ") }}), entre otros servicios. Los arriendos incluyen despacho, instalación y retiro. Las cotizaciones se hacen por WhatsApp.
 
 - Sitio web: {{ negocio.url }}/
 - Catálogo completo: {{ negocio.url }}{{ url_catalogo() }}

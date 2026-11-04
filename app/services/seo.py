@@ -33,6 +33,7 @@ def negocio():
         "name": n["nombre"],
         "legalName": n["razon_social"] or None,
         "description": descripcion_negocio(),
+        "slogan": n["slogan"] or None,
         "url": _abs("/"),
         "logo": _abs(url_for("static", filename="img/icon-512.png")),
         "image": _abs(url_for("static", filename="img/og-default.jpg")),

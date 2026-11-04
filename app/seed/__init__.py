@@ -49,11 +49,14 @@ def _usuarios():
 
 
 def _ajustes():
-    """Crea las claves nuevas y elimina las que ya no existen (p. ej. SEO, que pasó a seo_config)."""
+    """Crea las claves nuevas, elimina las que ya no existen (p. ej. SEO, que pasó a seo_config) y
+    actualiza los textos que siguen siendo de ejemplo de una versión anterior (nunca los editados)."""
     existentes = {a.clave: a for a in Ajuste.query.all()}
     for clave, valor in data.AJUSTES.items():
         if clave not in existentes:
             db.session.add(Ajuste(clave=clave, valor=valor))
+        elif existentes[clave].valor in data.TEXTOS_ANTERIORES.get(clave, ()):
+            existentes[clave].valor = valor
     for clave, ajuste in existentes.items():
         if clave not in data.AJUSTES:
             db.session.delete(ajuste)

@@ -74,7 +74,7 @@
 .hero__img{position:absolute;margin:0;border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 30px 60px -20px rgba(0,0,0,.5);border:6px solid rgba(255,255,255,.95);background:#fff;animation:float 7s ease-in-out infinite}
 .hero__img img{width:100%;height:100%;object-fit:cover}
 .hero__img figcaption{position:absolute;left:10px;right:10px;bottom:10px;display:flex;justify-content:space-between;gap:.5rem;padding:.5rem .75rem;border-radius:12px;background:rgba(255,255,255,.95);color:var(--ink);font-size:.8rem;font-weight:600}
-.hero__img figcaption b{color:var(--primary)}
+.hero__img figcaption b{white-space:nowrap;color:var(--primary)}
 .hero__img--1{width:62%;aspect-ratio:4/3;top:0;right:0;transform:rotate(3deg)}
 /* Las dos de abajo son iguales y en espejo: ambas se apoyan en el borde inferior de la grande */
 .hero__img--2,.hero__img--3{width:51%;aspect-ratio:4/3;bottom:10px}

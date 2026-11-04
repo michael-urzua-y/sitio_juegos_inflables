@@ -7,10 +7,11 @@ aparece una clave de ajuste nueva). Después todo se edita desde /admin.
 AJUSTES = {
     "nombre": "Entretenciones Santos",
     "razon_social": "Entretenciones Santos SpA",
-    "slogan": "Arriendo de juegos inflables para eventos",
-    "hero_titulo": "Juegos inflables que hacen tu evento *inolvidable*",
-    "hero_subtitulo": "Inflables, juegos mecánicos, de salón, típicos, de agua y mucho más. Despacho, "
-                      "instalación y retiro incluidos. Arma tu cotización en segundos y recíbela por WhatsApp.",
+    "slogan": "Entretención para cumpleaños, colegios y empresas",
+    "hero_titulo": "Entretención que hace tu evento *inolvidable*",
+    "hero_subtitulo": "Juegos inflables, toro mecánico, juegos electrónicos, de destreza, de salón, típicos y de "
+                      "agua, entre otros. Despacho, instalación y retiro incluidos. Arma tu cotización en "
+                      "segundos y recíbela por WhatsApp.",
     "whatsapp": "56912345678",
     "telefono": "+56 9 1234 5678",
     "email": "contacto@entretencionessantos.cl",
@@ -20,6 +21,19 @@ AJUSTES = {
     "horario": "Lunes a domingo, 9:00 a 21:00",
     # Texto que acompaña a todos los precios (solo texto, no se calcula nada)
     "precio_sufijo": "+ IVA",
+}
+
+# Textos de ejemplo de versiones anteriores. Si la base todavía tiene uno de estos (nadie lo
+# editó en el admin), se reemplaza por el valor actual de AJUSTES al iniciar.
+TEXTOS_ANTERIORES = {
+    "slogan": ["Arriendo de juegos inflables para eventos"],
+    "hero_titulo": ["Juegos inflables que hacen tu evento *inolvidable*"],
+    "hero_subtitulo": [
+        "Castillos, toboganes, acuáticos y mucho más. Despacho, instalación y retiro incluidos. "
+        "Arma tu cotización en segundos y recíbela por WhatsApp.",
+        "Inflables, juegos mecánicos, de salón, típicos, de agua y mucho más. Despacho, instalación y "
+        "retiro incluidos. Arma tu cotización en segundos y recíbela por WhatsApp.",
+    ],
 }
 
 # Bloques de contenido de la portada (editables en /admin/contenido)

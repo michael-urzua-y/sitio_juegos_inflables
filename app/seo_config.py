@@ -17,11 +17,13 @@ def _token(nombre):
 
 SEO = {
     # Título de la portada (pestaña del navegador y resultado de Google)
-    "seo_titulo": "Arriendo de juegos inflables en Santiago",
+    "seo_titulo": "Entretención para eventos y juegos inflables en Santiago",
 
     # Lo que la gente busca. Primero lo más importante.
     "seo_palabras_clave": ", ".join([
+        "entretención para eventos", "arriendo de entretenciones", "entretención para cumpleaños",
         "arriendo de juegos inflables", "juegos inflables", "castillos inflables", "toboganes inflables",
+        "juegos de destreza",
         "juegos mecánicos", "juegos mecanizados", "toro mecánico", "reloj derribador",
         "juegos interactivos", "zona infantil", "piscina de pelotas",
         "juegos electrónicos", "simulador de carreras", "máquina de baile",
@@ -33,8 +35,8 @@ SEO = {
 
     # Descripción para Google y redes (ideal: menos de 160 caracteres)
     "seo_descripcion": (
-        "Arriendo de juegos inflables, mecánicos, interactivos, electrónicos, de salón, "
-        "típicos y de agua para cumpleaños y eventos en Santiago. Instalación incluida."
+        "Entretención para eventos en Santiago: juegos inflables, toro mecánico, electrónicos, "
+        "de destreza, de salón, típicos y de agua, entre otros. Instalación incluida."
     ),
 
     # Ubicación (títulos "Arriendo de X en {ciudad}" y dirección en Schema.org)

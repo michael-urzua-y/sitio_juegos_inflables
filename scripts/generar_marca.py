@@ -117,9 +117,9 @@ def tarjeta_por_defecto(fondo, logo):
     lienzo.alpha_composite(tam(logo, 520), (630, 55))
     d = ImageDraw.Draw(lienzo)
     titulo = _fuente("Fredoka", "Bold", 76)
-    d.text((72, 150), "Arriendo de", font=titulo, fill="white")
-    d.text((72, 236), "juegos inflables", font=titulo, fill=AMARILLO)
-    d.text((72, 340), "Toro mecánico · Juegos electrónicos\nJuegos de destreza y mucho más",
+    d.text((72, 150), "Entretención", font=titulo, fill="white")
+    d.text((72, 236), "para tu evento", font=titulo, fill=AMARILLO)
+    d.text((72, 340), "Juegos inflables · Toro mecánico\nElectrónicos · Destreza y mucho más",
            font=_fuente("PlusJakartaSans", "SemiBold", 28), fill=(255, 255, 255, 220), spacing=12)
     boton = _fuente("PlusJakartaSans", "ExtraBold", 28)
     texto = "Cotiza por WhatsApp"
