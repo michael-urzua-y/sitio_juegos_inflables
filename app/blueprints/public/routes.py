@@ -132,7 +132,10 @@ def manifest():
                 "type": "image/png", "purpose": proposito}
     return {
         "name": n["nombre"], "short_name": n["nombre_corto"], "description": seo.descripcion_negocio(),
-        "lang": "es-CL", "start_url": "/", "display": "standalone",
+        "lang": "es-CL", "start_url": "/",
+        # "browser": el sitio se abre siempre en el navegador. Con "standalone" Chrome lo trata
+        # como app instalable (PWA) y ofrece "Instalar", algo que no buscamos en un sitio comercial.
+        "display": "browser",
         "background_color": MARCA["color_tema"], "theme_color": MARCA["color_tema"],
         "icons": [icono("icon-192.png", 192), icono("icon-512.png", 512),
                   icono("icon-maskable-512.png", 512, "maskable")],

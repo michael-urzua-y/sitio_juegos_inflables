@@ -10,7 +10,8 @@
 
 {% macro add_button(j, label="Cotizar", cls="") -%}
 <button class="btn btn--add {{ cls }}" type="button" data-add
-  data-slug="{{ j.slug }}" data-nombre="{{ j.nombre }}" data-precio="{{ j.precio }}" data-cat="{{ j.categoria.nombre }}">
+  data-slug="{{ j.slug }}" data-nombre="{{ j.nombre }}" data-precio="{{ j.precio }}" data-cat="{{ j.categoria.nombre }}"
+  data-img="{{ imagen_juego(j, 480) }}">
   {{ icon("plus") }}<span>{{ label }}</span>
 </button>
 {%- endmacro %}
@@ -25,7 +26,7 @@
 {%- endmacro %}
 
 {% macro price(valor, cls="") -%}
-<p class="price {{ cls }}"><small>Desde</small>{{ valor|clp }}</p>
+<p class="price {{ cls }}"><small>Desde</small>{{ valor|clp }}{% if negocio.precio_sufijo %} <span class="price__iva">{{ negocio.precio_sufijo }}</span>{% endif %}</p>
 {%- endmacro %}
 
 {% macro hot_tag(j) -%}

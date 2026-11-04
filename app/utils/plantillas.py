@@ -83,6 +83,7 @@ def url_catalogo(categoria=None, **params):
 
 def registrar(app):
     app.add_template_filter(formato_clp, "clp")
+    app.add_template_filter(ajustes.precio_texto, "precio")  # "$45.000 + IVA"
     app.add_template_filter(resaltar, "resaltar")
     app.add_template_filter(lambda a, b: list(zip(a, b)), "zip")
 

@@ -25,7 +25,7 @@
 {% for c in categorias %}
 ### {{ c.nombre }}
 {% for j in juegos if j.categoria_id == c.id %}
-- [{{ j.nombre }}]({{ negocio.url }}{{ url_for('public.juego', slug=j.slug) }}): desde {{ j.precio|clp }}.{% if j.medidas %} Medidas: {{ j.medidas }}.{% endif %}{% if j.edad %} Edad: {{ j.edad }}.{% endif %}{% if j.capacidad %} Capacidad: {{ j.capacidad }}.{% endif %} {{ j.descripcion }}{% endfor %}
+- [{{ j.nombre }}]({{ negocio.url }}{{ url_for('public.juego', slug=j.slug) }}): desde {{ j.precio|precio }}.{% if j.medidas %} Medidas: {{ j.medidas }}.{% endif %}{% if j.edad %} Edad: {{ j.edad }}.{% endif %}{% if j.capacidad %} Capacidad: {{ j.capacidad }}.{% endif %} {{ j.descripcion }}{% endfor %}
 {% endfor %}
 ## Preguntas frecuentes
 {% for p in preguntas %}

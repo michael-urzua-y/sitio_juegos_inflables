@@ -7,8 +7,8 @@
      seo.producto(juego, og_imagen_juego(juego)),
      seo.migas([("Catálogo", url_catalogo()), (categoria.nombre, url_catalogo(categoria)),
                 (juego.nombre, url_for('public.juego', slug=juego.slug))])) %}
-{% block title %}Arriendo {{ juego.nombre }} ({{ categoria.nombre }}) desde {{ juego.precio|clp }}{% endblock %}
-{% block description %}{{ juego.descripcion|truncate(110) }} Arriendo desde {{ juego.precio|clp }} en {{ negocio.zona }}. Despacho e instalación incluidos.{% endblock %}
+{% block title %}Arriendo {{ juego.nombre }} ({{ categoria.nombre }}) desde {{ juego.precio|precio }}{% endblock %}
+{% block description %}{{ juego.descripcion|truncate(110) }} Arriendo desde {{ juego.precio|precio }} en {{ negocio.zona }}. Despacho e instalación incluidos.{% endblock %}
 {% block content %}
 <section class="section section--tight">
   <div class="container">
@@ -31,7 +31,7 @@
         </ul>
         <div class="detail__cta">
           {{ add_button(juego, "Agregar a cotización", "btn--lg") }}
-          {{ wa_button("¡Hola! Me interesa arrendar: " ~ juego.nombre ~ " (" ~ juego.precio|clp ~ "). ¿Tienen disponibilidad?", "Consultar", "btn--wa btn--lg") }}
+          {{ wa_button("¡Hola! Me interesa arrendar: " ~ juego.nombre ~ " (" ~ juego.precio|precio ~ "). ¿Tienen disponibilidad?", "Consultar", "btn--wa btn--lg") }}
         </div>
       </div>
     </div>

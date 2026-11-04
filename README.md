@@ -12,7 +12,7 @@ Sitio web de **Entretenciones Santos SpA** para el arriendo de juegos inflables.
 - Portada con hero, cinta animada de categorías, beneficios, los juegos más pedidos, pasos y preguntas frecuentes.
 - **Catálogo paginado** (`/catalogo`, 12 por página) con filtro por categoría y buscador que ignora tildes. Escala a cientos de juegos.
 - Menú con desplegable de categorías, página por categoría y página de detalle por juego.
-- **Cotizador**: el cliente agrega juegos, ajusta cantidades, completa fecha, comuna y horario, y envía todo armado por **WhatsApp**.
+- **Cotizador**: el cliente agrega juegos (con su foto), ajusta cantidades, completa nombre, fecha y comuna (detalles opcionales) y envía todo armado por **WhatsApp** con un código de referencia `WEB-XXXXX`.
 - Botón flotante de WhatsApp, footer con Instagram y Facebook.
 - Diseño responsive (móvil, tablet y escritorio), accesible y con animaciones que respetan `prefers-reduced-motion`.
 - **SEO completo** para Google, IAs y redes sociales (ver la sección [SEO](#seo-google-ias-y-redes-sociales)).

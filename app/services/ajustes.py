@@ -6,7 +6,7 @@ from flask import current_app, g
 from app.extensions import db
 from app.models import Ajuste
 from app.seo_config import SEO
-from app.utils.texto import abreviar_nombre, email_valido, recortar, solo_digitos, url_segura
+from app.utils.texto import formato_clp, abreviar_nombre, email_valido, recortar, solo_digitos, url_segura
 
 # (grupo, [(clave, etiqueta, tipo_input)])
 # Textos del sitio: los edita el super admin
@@ -16,6 +16,9 @@ GRUPOS_TEXTOS = [
         ("nombre_corto", "Nombre corto: panel admin e ícono en el celular (vacío = automático: «Ent. Santos»)", "text"),
         ("razon_social", "Razón social (aparece en el footer)", "text"),
         ("slogan", "Slogan", "text"),
+    ]),
+    ("Precios", [
+        ("precio_sufijo", "Texto junto a los precios (ej: “+ IVA”). Solo se muestra, no se calcula. Vacío = no se muestra", "text"),
     ]),
     ("Portada", [
         ("hero_titulo", "Título principal (encierra entre *asteriscos* la palabra a destacar)", "text"),
@@ -43,6 +46,12 @@ LIMPIADORES = {
     "email": email_valido,
 }
 LARGO_MAX = 500
+
+
+def precio_texto(valor):
+    """Precio público: '$45.000 + IVA'. Único lugar que define cómo se muestra un precio."""
+    sufijo = (obtener().get("precio_sufijo") or "").strip()
+    return f"{formato_clp(valor)} {sufijo}".strip()
 
 
 def editables():

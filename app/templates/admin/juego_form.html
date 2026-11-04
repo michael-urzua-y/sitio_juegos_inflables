@@ -30,7 +30,10 @@
         </div>
         <p class="cat-select__msg" data-cat-msg role="status" hidden></p>
       </div>
-      {{ field("precio", "Precio (CLP) *", v("precio"), inputmode="numeric", placeholder="45000", required=true, maxlength=12) }}
+      <div>
+        {{ field("precio", "Precio (CLP) *", v("precio"), inputmode="numeric", placeholder="45000", required=true, maxlength=12) }}
+        <p class="muted small field-help">Escribe solo el valor. En el sitio se mostrará como “$45.000{{ (' ' ~ negocio.precio_sufijo) if negocio.precio_sufijo }}”.</p>
+      </div>
     </div>
     {{ field("descripcion", "Descripción", v("descripcion"), type="textarea", rows=4, maxlength=2000) }}
     <div class="row row--3">

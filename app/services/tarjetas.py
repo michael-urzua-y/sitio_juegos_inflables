@@ -17,7 +17,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 
 from app.services.ajustes import obtener as ajustes
 from app.utils.imagenes import nombre_archivo
-from app.utils.texto import formato_clp
+from app.services import ajustes as ajustes_srv
 
 ANCHO, ALTO = 1200, 630
 MARGEN = 72
@@ -169,7 +169,7 @@ def _ruta_foto_juego(juego):
 
 
 def datos_juego(juego):
-    return (juego.categoria.nombre, juego.nombre, f"Arriendo desde {formato_clp(juego.precio)}",
+    return (juego.categoria.nombre, juego.nombre, f"Arriendo desde {ajustes_srv.precio_texto(juego.precio)}",
             _ruta_foto_juego(juego))
 
 
@@ -178,7 +178,7 @@ def datos_categoria(categoria, juegos):
     foto = _ruta_foto_juego(con_foto or juegos[0]) if juegos else _static("img", "placeholders", "generico.jpg")
     if juegos:
         minimo = min(j.precio for j in juegos)
-        destacado = f"{len(juegos)} {'opción' if len(juegos) == 1 else 'opciones'} · desde {formato_clp(minimo)}"
+        destacado = f"{len(juegos)} {'opción' if len(juegos) == 1 else 'opciones'} · desde {ajustes_srv.precio_texto(minimo)}"
     else:
         destacado = None
     ciudad = ajustes()["ciudad"]

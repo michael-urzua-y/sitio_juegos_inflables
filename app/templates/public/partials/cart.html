@@ -18,19 +18,15 @@
     </div>
     <ul class="cart__list" data-list></ul>
     <form class="cart__form" data-form hidden novalidate>
-      <h3>Datos del evento <span class="req-note">Todos los campos son obligatorios</span></h3>
-      {{ field("nombre", "Tu nombre", placeholder="Ej: Juan Pérez", autocomplete="name", required=true, minlength=2, maxlength=60) }}
+      <h3>Datos del evento <span class="req-note">Los campos con * son obligatorios</span></h3>
+      {{ field("nombre", "Tu nombre *", placeholder="Ej: Juan Pérez", autocomplete="name", required=true, minlength=2, maxlength=60) }}
       <div class="field-row">
-        {{ field("fecha", "Fecha del evento", type="date", required=true) }}
-        {{ field("comuna", "Comuna", placeholder="Ej: Maipú", list="comunas-rm", autocomplete="off", required=true, minlength=2, maxlength=40) }}
+        {{ field("fecha", "Fecha del evento *", type="date", required=true) }}
+        {{ field("comuna", "Comuna *", placeholder="Ej: Maipú", list="comunas-rm", autocomplete="off", required=true, minlength=2, maxlength=40) }}
       </div>
       <datalist id="comunas-rm">{% for c in comunas_rm %}<option value="{{ c }}">{% endfor %}</datalist>
-      <div class="field-row">
-        {{ field("hora_inicio", "Desde", type="time", required=true, step=900) }}
-        {{ field("hora_fin", "Hasta", type="time", required=true, step=900) }}
-      </div>
-      {{ field("detalles", "Detalles del evento", type="textarea", rows=2, required=true, minlength=5, maxlength=300,
-               placeholder="Tipo de evento, cantidad de niños, superficie (pasto, cemento)…") }}
+      {{ field("detalles", "Detalles del evento (opcional)", type="textarea", rows=2, maxlength=300,
+               placeholder="Tipo de evento, horario, cantidad de niños, superficie (pasto, cemento)…") }}
     </form>
   </div>
   <div class="cart__foot" data-foot hidden>

@@ -18,6 +18,8 @@ AJUSTES = {
     "facebook": "https://facebook.com/",
     "zona": "Santiago y alrededores",
     "horario": "Lunes a domingo, 9:00 a 21:00",
+    # Texto que acompaña a todos los precios (solo texto, no se calcula nada)
+    "precio_sufijo": "+ IVA",
 }
 
 # Bloques de contenido de la portada (editables en /admin/contenido)

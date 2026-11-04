@@ -86,6 +86,10 @@ def producto(juego, imagen_url):
             "@type": "Offer",
             "price": juego.precio,
             "priceCurrency": "CLP",
+            "priceSpecification": {
+                "@type": "UnitPriceSpecification", "price": juego.precio, "priceCurrency": "CLP",
+                "valueAddedTaxIncluded": not (ajustes()["precio_sufijo"] or "").strip().startswith("+"),
+            },
             "availability": "https://schema.org/InStock",
             "businessFunction": "http://purl.org/goodrelations/v1#LeaseOut",  # arriendo
             "url": _abs(url_for("public.juego", slug=juego.slug)),

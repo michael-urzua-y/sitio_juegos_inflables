@@ -24,7 +24,7 @@
       {% for j in portada %}
       <figure class="hero__img hero__img--{{ loop.index }}">
         {{ img_juego(j, sizes="(max-width: 600px) 60vw, 360px", lazy=false, alt="") }}
-        <figcaption>{{ j.nombre }} <b>{{ j.precio|clp }}</b></figcaption>
+        <figcaption>{{ j.nombre }} <b>{{ j.precio|precio }}</b></figcaption>
       </figure>
       {% endfor %}
     </div>

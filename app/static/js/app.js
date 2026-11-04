@@ -9,6 +9,20 @@
   var SITE = { whatsapp: document.body.dataset.whatsapp, nombre: document.body.dataset.negocio };
   var STORAGE_KEY = "cotizacion_v1";
   var clp = function (n) { return "$" + Math.round(n).toLocaleString("es-CL"); };
+  // Precio público con su texto (ej: "$45.000 + IVA"); el texto se define en el admin
+  var SUFIJO = (document.body.dataset.precioSufijo || "").trim();
+  var precio = function (n) { return clp(n) + (SUFIJO ? " " + SUFIJO : ""); };
+  // Igual que `precio`, pero en pantalla: el texto ("+ IVA") va más pequeño, como en las tarjetas
+  var pintarPrecio = function (nodo, n) {
+    nodo.textContent = clp(n);
+    if (SUFIJO) {
+      var s = document.createElement("span");
+      s.className = "price__iva";
+      s.textContent = " " + SUFIJO;
+      nodo.appendChild(s);
+    }
+    return nodo;
+  };
 
   /* ---------- Header / navegación ---------- */
   var header = $("#header");
@@ -49,6 +63,18 @@
   }
 
   /* ---------- Cotizador (carrito en localStorage) ---------- */
+  var IMG_GENERICA = "/static/img/placeholders/generico.svg";
+  // Solo se aceptan imágenes del propio sitio (rutas que empiezan con "/")
+  var imagenSegura = function (src) {
+    return typeof src === "string" && /^\/[^\/]/.test(src) ? src : "";
+  };
+  // Juegos agregados antes de esta versión no guardaban imagen: se busca en la página
+  var imagenDe = function (it) {
+    if (it.img) return it.img;
+    var slug = window.CSS && CSS.escape ? CSS.escape(it.slug) : it.slug;
+    var b = document.querySelector('[data-add][data-slug="' + slug + '"]');
+    return (b && imagenSegura(b.dataset.img)) || IMG_GENERICA;
+  };
   var Cart = {
     items: {},
     load: function () {
@@ -61,7 +87,7 @@
     add: function (d) {
       var it = this.items[d.slug];
       if (it) it.qty += 1;
-      else this.items[d.slug] = { slug: d.slug, nombre: d.nombre, precio: Number(d.precio) || 0, cat: d.cat, qty: 1 };
+      else this.items[d.slug] = { slug: d.slug, nombre: d.nombre, precio: Number(d.precio) || 0, cat: d.cat, img: imagenSegura(d.img), qty: 1 };
       this.save();
     },
     setQty: function (slug, qty) {
@@ -144,16 +170,24 @@
     $("[data-empty]").hidden = items.length > 0;
     form.hidden = items.length === 0;
     $("[data-foot]").hidden = items.length === 0;
-    $("[data-total]").textContent = clp(Cart.total());
+    pintarPrecio($("[data-total]"), Cart.total());
     if (typeof validar === "function" && form.elements.nombre) validar();
 
     listEl.textContent = "";
     items.forEach(function (it) {
       var li = el("li", "ci");
-      var name = el("div", "ci__name", it.nombre);
-      name.appendChild(el("span", "ci__cat", it.cat));
-      li.appendChild(name);
-      li.appendChild(el("div", "ci__price", clp(it.precio * it.qty)));
+      var img = el("img", "ci__img");
+      img.src = imagenDe(it);
+      img.alt = "";
+      img.width = 72;
+      img.height = 54;
+      img.loading = "lazy";
+      li.appendChild(img);
+
+      var info = el("div", "ci__info");
+      info.appendChild(el("p", "ci__name", it.nombre));
+      info.appendChild(el("p", "ci__unit", precio(it.precio) + (it.cat ? " · " + it.cat : "")));
+      li.appendChild(info);
 
       var row = el("div", "ci__row");
       var qty = el("div", "qty");
@@ -161,9 +195,9 @@
       qty.appendChild(el("span", null, it.qty));
       qty.appendChild(iconBtn("plus", "Agregar uno", "inc", it.slug));
       row.appendChild(qty);
+      row.appendChild(pintarPrecio(el("strong", "ci__price"), it.precio * it.qty));
       var del = iconBtn("trash", "Eliminar " + it.nombre, "del", it.slug);
       del.className = "ci__del";
-      del.appendChild(document.createTextNode(" Quitar"));
       row.appendChild(del);
       li.appendChild(row);
       listEl.appendChild(li);
@@ -220,20 +254,14 @@
   campo("fecha").min = hoyISO();
 
   // Reglas: devuelven un mensaje de error o "" si el campo es válido
+  // Campos obligatorios: cada regla devuelve un mensaje de error o "" si es válido
   var REGLAS = {
     nombre: function (v) { return v.length < 2 ? "Escribe tu nombre." : ""; },
     fecha: function (v) { return !v ? "Elige la fecha del evento." : (v < hoyISO() ? "La fecha no puede ser anterior a hoy." : ""); },
-    comuna: function (v) { return v.length < 2 ? "Indica la comuna." : ""; },
-    hora_inicio: function (v) { return !v ? "Indica la hora de inicio." : ""; },
-    hora_fin: function (v) {
-      if (!v) return "Indica la hora de término.";
-      var ini = valor("hora_inicio");
-      return ini && v <= ini ? "Debe ser posterior a la hora de inicio." : "";
-    },
-    detalles: function (v) { return v.length < 5 ? "Cuéntanos un poco del evento." : ""; }
+    comuna: function (v) { return v.length < 2 ? "Indica la comuna." : ""; }
   };
-  var NOMBRES = { nombre: "nombre", fecha: "fecha", comuna: "comuna", hora_inicio: "hora de inicio",
-                  hora_fin: "hora de término", detalles: "detalles del evento" };
+  var NOMBRES = { nombre: "nombre", fecha: "fecha", comuna: "comuna" };
+  var CAMPOS = Object.keys(REGLAS).concat(["detalles"]);  // los que se recuerdan en el navegador
 
   var mostrarError = function (n, msg) {
     var input = campo(n), label = input.closest(".field");
@@ -266,19 +294,18 @@
   // Guarda los datos en el navegador para no perderlos al cerrar el panel o recargar
   var guardarDatos = function () {
     var d = {};
-    Object.keys(REGLAS).forEach(function (n) { d[n] = campo(n).value; });
+    CAMPOS.forEach(function (n) { d[n] = campo(n).value; });
     try { localStorage.setItem(DATOS_KEY, JSON.stringify(d)); } catch (e) { /* modo privado */ }
   };
   var cargarDatos = function () {
     var d;
     try { d = JSON.parse(localStorage.getItem(DATOS_KEY)) || {}; } catch (e) { d = {}; }
-    Object.keys(REGLAS).forEach(function (n) {
+    CAMPOS.forEach(function (n) {
       if (typeof d[n] === "string" && !(n === "fecha" && d[n] < hoyISO())) campo(n).value = d[n];
     });
   };
 
   form.addEventListener("input", function (e) {
-    if (e.target.name === "hora_inicio" && valor("hora_fin")) tocados.hora_fin = true;
     guardarDatos(); validar();
   });
   form.addEventListener("focusout", function (e) {
@@ -312,19 +339,19 @@
       "",
       "¡Hola " + SITE.nombre + "! 👋",
       "Mi nombre es *" + limpio("nombre", 60) + "* y quiero cotizar para el *" + fechaEnPalabras(valor("fecha")) +
-        "*, en la comuna de *" + limpio("comuna", 40) + "*, entre las *" + valor("hora_inicio") + " y las " +
-        valor("hora_fin") + " hrs*, " + (varios ? "los siguientes juegos:" : "el siguiente juego:"),
+        "*, en la comuna de *" + limpio("comuna", 40) + "*, " + (varios ? "los siguientes juegos:" : "el siguiente juego:"),
       ""
     ];
     items.forEach(function (it) {
-      lineas.push("• " + it.qty + " × " + it.nombre + " — " + clp(it.precio * it.qty));
+      lineas.push("• " + it.qty + " × " + it.nombre + " — " + precio(it.precio * it.qty));
     });
     lineas.push(
       "",
-      "💰 Total referencial: *" + clp(Cart.total()) + "*",
-      "",
-      "📝 Detalles del evento: " + limpio("detalles", 300),
-      "",
+      "💰 Total referencial: *" + precio(Cart.total()) + "*",
+      ""
+    );
+    if (valor("detalles")) lineas.push("📝 Detalles del evento: " + limpio("detalles", 300), "");
+    lineas.push(
       "¿Tienen disponibilidad? ¡Muchas gracias!",
       "_Enviado desde " + window.location.hostname + "_"
     );

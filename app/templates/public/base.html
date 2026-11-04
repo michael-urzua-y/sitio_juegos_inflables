@@ -47,7 +47,7 @@
   <script type="application/ld+json">{{ (jsonld or seo.grafo())|tojson }}</script>
   <link rel="stylesheet" href="{{ asset('css/site.css') }}">
 </head>
-<body data-whatsapp="{{ negocio.whatsapp }}" data-negocio="{{ negocio.nombre }}">
+<body data-whatsapp="{{ negocio.whatsapp }}" data-negocio="{{ negocio.nombre }}" data-precio-sufijo="{{ negocio.precio_sufijo }}">
   {% include "partials/icons.html" %}
   <a class="skip" href="#contenido">Saltar al contenido</a>
   {% include "public/partials/header.html" %}
